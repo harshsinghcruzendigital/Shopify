@@ -43,6 +43,13 @@
     --mg-info: {{ settings.color_info }};
 
     --mg-container-active: {{ container }}px;
+
+    {%- if settings.type_heading_font -%}--mg-font-display: {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }};{%- endif -%}
+    {%- if settings.type_body_font -%}
+      --mg-font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+      --mg-font-eyebrow: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    {%- endif -%}
+    {%- if settings.button_radius -%}--mg-btn-radius: {{ settings.button_radius }}px;{%- endif -%}
   }
   {%- unless settings.animations_enabled -%}
   :root { --mg-transition-base: none; --mg-transition-slow: none; }

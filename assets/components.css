@@ -22,7 +22,7 @@
   text-align: center;
   line-height: 1;
   border: var(--mg-border-hairline) solid transparent;
-  border-radius: var(--mg-radius-none);
+  border-radius: var(--mg-btn-radius, var(--mg-radius-none));
   cursor: pointer;
   transition: background-color var(--mg-dur-base) var(--mg-ease),
               color var(--mg-dur-base) var(--mg-ease),

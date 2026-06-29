@@ -15,6 +15,25 @@
       "borders": "Borders",
       "status": "Status"
     },
+    "typography": {
+      "header": "Typography",
+      "heading_font": "Heading font",
+      "body_font": "Body font",
+      "heading_scale": "Heading size scale",
+      "body_scale": "Body size scale"
+    },
+    "buttons": {
+      "header": "Buttons",
+      "radius": "Button corner radius"
+    },
+    "product": {
+      "header": "Product cards",
+      "show_vendor": "Show vendor",
+      "show_rating": "Show rating",
+      "show_swatches": "Show color swatches",
+      "quick_view": "Enable quick view",
+      "wishlist": "Enable wishlist"
+    },
     "layout": {
       "header": "Layout",
       "container_width": "Maximum content width",

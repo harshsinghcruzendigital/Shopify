@@ -1,0 +1,36 @@
+{%- comment -%}
+  structured-data.liquid — sitewide Organization + WebSite JSON-LD.
+  (Product/Breadcrumb JSON-LD live in their own sections/snippets.)
+{%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": {{ shop.name | json }},
+  "url": {{ request.origin | append: routes.root_url | json }},
+  {%- if settings.logo %}"logo": "https:{{ settings.logo | image_url: width: 600 }}",{% endif -%}
+  "sameAs": [
+    {%- assign socials = '' -%}
+    {%- if settings.social_instagram != blank %}{{ settings.social_instagram | json }},{% endif -%}
+    {%- if settings.social_facebook != blank %}{{ settings.social_facebook | json }},{% endif -%}
+    {%- if settings.social_pinterest != blank %}{{ settings.social_pinterest | json }},{% endif -%}
+    {%- if settings.social_youtube != blank %}{{ settings.social_youtube | json }},{% endif -%}
+    {%- if settings.social_tiktok != blank %}{{ settings.social_tiktok | json }},{% endif -%}
+    {%- if settings.social_x != blank %}{{ settings.social_x | json }}{% endif -%}
+    ""
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ shop.name | json }},
+  "url": {{ request.origin | append: routes.root_url | json }},
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ request.origin }}{{ routes.search_url }}?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>

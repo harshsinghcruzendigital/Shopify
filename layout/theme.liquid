@@ -26,12 +26,12 @@
       <meta name="mg:product-handle" content="{{ product.handle }}">
     {%- endif -%}
 
-    {% comment %} --- Fonts (CDN for dev; self-host woff2 before commercial release) --- {% endcomment %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@400;500;600&family=Jost:wght@400;500;600&display=swap">
+    {% render 'meta-tags' %}
+    {% render 'structured-data' %}
+
+    {% comment %} --- Fonts: Shopify-hosted via font_picker (no external request) --- {% endcomment %}
+    {%- if settings.type_heading_font -%}{{ settings.type_heading_font | font_face: font_display: 'swap' }}{%- endif -%}
+    {%- if settings.type_body_font -%}{{ settings.type_body_font | font_face: font_display: 'swap' }}{%- endif -%}
 
     {% comment %} --- Design tokens: defaults then merchant overrides --- {% endcomment %}
     {{ 'variables.css' | asset_url | stylesheet_tag }}

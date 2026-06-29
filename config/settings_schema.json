@@ -38,6 +38,42 @@
     ]
   },
   {
+    "name": "t:settings.typography.header",
+    "settings": [
+      { "type": "font_picker", "id": "type_heading_font", "label": "t:settings.typography.heading_font", "default": "playfair_display_n4" },
+      { "type": "font_picker", "id": "type_body_font", "label": "t:settings.typography.body_font", "default": "assistant_n4" },
+      { "type": "range", "id": "type_heading_scale", "min": 90, "max": 130, "step": 5, "unit": "%", "label": "t:settings.typography.heading_scale", "default": 100 },
+      { "type": "range", "id": "type_body_scale", "min": 90, "max": 120, "step": 5, "unit": "%", "label": "t:settings.typography.body_scale", "default": 100 }
+    ]
+  },
+  {
+    "name": "t:settings.buttons.header",
+    "settings": [
+      {
+        "type": "select",
+        "id": "button_radius",
+        "label": "t:settings.buttons.radius",
+        "options": [
+          { "value": "0", "label": "Square" },
+          { "value": "2", "label": "Subtle (2px)" },
+          { "value": "4", "label": "Soft (4px)" },
+          { "value": "999", "label": "Pill" }
+        ],
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "name": "t:settings.product.header",
+    "settings": [
+      { "type": "checkbox", "id": "card_show_vendor", "label": "t:settings.product.show_vendor", "default": false },
+      { "type": "checkbox", "id": "card_show_rating", "label": "t:settings.product.show_rating", "default": true },
+      { "type": "checkbox", "id": "card_show_swatches", "label": "t:settings.product.show_swatches", "default": true },
+      { "type": "checkbox", "id": "card_enable_quick_view", "label": "t:settings.product.quick_view", "default": true },
+      { "type": "checkbox", "id": "enable_wishlist", "label": "t:settings.product.wishlist", "default": true }
+    ]
+  },
+  {
     "name": "t:settings.colors.header",
     "settings": [
       { "type": "header", "content": "t:settings.colors.brand" },
