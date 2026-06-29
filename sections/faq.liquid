@@ -1,0 +1,109 @@
+{%- comment -%}
+  Madrishi Global — Homepage Section 19: FAQ
+  Accessible accordion (question/answer blocks). Custom element <mg-faq>.
+  Reusable on the FAQ page.
+{%- endcomment -%}
+<section
+  class="mg-faq {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="--mg-faq-bg: {{ section.settings.background }}; --mg-faq-text: {{ section.settings.text_color }}; --mg-faq-pad-top: {{ section.settings.padding_top }}px; --mg-faq-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-mg-animate-section
+>
+  <div class="mg-faq__inner mg-container mg-container--narrow">
+    <div class="mg-section-header mg-section-header--center">
+      {%- if section.settings.eyebrow != blank -%}<p class="mg-section-header__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      {%- if section.settings.heading != blank -%}<h2 class="mg-section-header__title" data-mg-animate>{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    </div>
+
+    <mg-faq class="mg-faq__list" data-mg-animate {% if section.settings.single_open %}data-single-open="true"{% endif %}>
+      {%- for block in section.blocks -%}
+        <div class="mg-faq__item" {{ block.shopify_attributes }}>
+          <h3 class="mg-faq__q">
+            <button class="mg-faq__trigger" type="button" aria-expanded="false" id="mg-faq-q-{{ block.id }}" aria-controls="mg-faq-a-{{ block.id }}" data-mg-faq-trigger>
+              <span>{{ block.settings.question | escape }}</span>
+              {%- render 'icon', name: 'plus', size: 18 -%}{%- render 'icon', name: 'minus', size: 18 -%}
+            </button>
+          </h3>
+          <div class="mg-faq__a" id="mg-faq-a-{{ block.id }}" role="region" aria-labelledby="mg-faq-q-{{ block.id }}" hidden>
+            <div class="mg-faq__a-inner rte">{{ block.settings.answer }}</div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </mg-faq>
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-faq { background: var(--mg-faq-bg, var(--mg-bg-page)); color: var(--mg-faq-text, var(--mg-text)); padding-block: var(--mg-faq-pad-top, var(--mg-section-spacing)) var(--mg-faq-pad-bottom, var(--mg-section-spacing)); }
+.mg-faq .mg-section-header__title { color: inherit; }
+.mg-faq__list { display: block; border-top: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-faq__item { border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-faq__q { margin: 0; }
+.mg-faq__trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--mg-space-4); width: 100%; padding: var(--mg-space-5) 0; text-align: left; font-family: var(--mg-font-display); font-size: var(--mg-fs-product-title); color: var(--mg-text); }
+.mg-faq__trigger:hover { color: var(--mg-gold); }
+.mg-faq__trigger .mg-icon { flex: 0 0 auto; color: var(--mg-gold); }
+.mg-faq__trigger .mg-icon--minus { display: none; }
+.mg-faq__trigger[aria-expanded="true"] .mg-icon--plus { display: none; }
+.mg-faq__trigger[aria-expanded="true"] .mg-icon--minus { display: block; }
+.mg-faq__a { overflow: hidden; }
+.mg-faq__a-inner { padding-bottom: var(--mg-space-5); color: var(--mg-text-secondary); line-height: var(--mg-lh-body); max-width: 60ch; }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% javascript %}
+class MGFaq extends HTMLElement {
+  connectedCallback() {
+    this.single = this.dataset.singleOpen === 'true';
+    this.addEventListener('click', (e) => {
+      const trigger = e.target.closest('[data-mg-faq-trigger]');
+      if (!trigger) return;
+      const panel = document.getElementById(trigger.getAttribute('aria-controls'));
+      const open = trigger.getAttribute('aria-expanded') === 'true';
+      if (this.single && !open) this._closeAll();
+      trigger.setAttribute('aria-expanded', String(!open));
+      if (panel) panel.hidden = open;
+    });
+  }
+  _closeAll() {
+    this.querySelectorAll('[data-mg-faq-trigger]').forEach((t) => {
+      t.setAttribute('aria-expanded', 'false');
+      const p = document.getElementById(t.getAttribute('aria-controls'));
+      if (p) p.hidden = true;
+    });
+  }
+}
+if (!customElements.get('mg-faq')) customElements.define('mg-faq', MGFaq);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "FAQ",
+  "tag": "section",
+  "class": "mg-faq-section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Support" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently Asked Questions" },
+    { "type": "checkbox", "id": "single_open", "label": "Open one at a time", "default": true },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "blocks": [
+    {
+      "type": "qa",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How long does shipping take?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Complimentary express shipping arrives within 2–4 business days.</p>" }
+      ]
+    }
+  ],
+  "max_blocks": 24,
+  "presets": [ { "name": "FAQ", "blocks": [ { "type": "qa" }, { "type": "qa", "settings": { "question": "What is your returns policy?" } }, { "type": "qa", "settings": { "question": "Do you ship internationally?" } } ] } ]
+}
+{% endschema %}

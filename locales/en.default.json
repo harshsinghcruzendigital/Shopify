@@ -63,6 +63,9 @@
   "cookie": {
     "aria": "Cookie consent"
   },
+  "blog": {
+    "read_more": "Read more"
+  },
   "newsletter": {
     "email": "Email",
     "placeholder": "Enter your email",

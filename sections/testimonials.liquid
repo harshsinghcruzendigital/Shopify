@@ -1,0 +1,95 @@
+{%- comment -%}
+  Madrishi Global — Homepage Section 11: Testimonials
+  Luxury review cards in a carousel (reuses <mg-carousel>). Each block:
+  quote, rating, customer photo, name, role. No section JS.
+{%- endcomment -%}
+<section
+  class="mg-tm {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="--mg-tm-bg: {{ section.settings.background }}; --mg-tm-text: {{ section.settings.text_color }}; --mg-tm-pad-top: {{ section.settings.padding_top }}px; --mg-tm-pad-bottom: {{ section.settings.padding_bottom }}px; --mg-carousel-item-d: calc({{ 100 | divided_by: section.settings.per_view }}% - var(--mg-space-5));"
+  data-mg-animate-section
+>
+  <div class="mg-tm__inner mg-container">
+    <div class="mg-section-header mg-section-header--center">
+      {%- if section.settings.eyebrow != blank -%}<p class="mg-section-header__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      {%- if section.settings.heading != blank -%}<h2 class="mg-section-header__title" data-mg-animate>{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    </div>
+
+    <mg-carousel class="mg-carousel" data-mg-animate>
+      <button class="mg-carousel__arrow mg-carousel__arrow--prev" type="button" data-mg-carousel-prev aria-label="{{ 'general.accessibility.previous' | t }}">{%- render 'icon', name: 'chevron-left' -%}</button>
+      <ul class="mg-carousel__track" data-mg-carousel-track role="list">
+        {%- for block in section.blocks -%}
+          <li {{ block.shopify_attributes }}>
+            <figure class="mg-tm__card">
+              {%- if block.settings.rating > 0 -%}
+                <div class="mg-tm__rating" role="img" aria-label="{{ block.settings.rating }} {{ 'products.card.out_of_5' | t }}">
+                  {%- for i in (1..5) -%}<span aria-hidden="true">{% if i <= block.settings.rating %}★{% else %}☆{% endif %}</span>{%- endfor -%}
+                </div>
+              {%- endif -%}
+              <blockquote class="mg-tm__quote">{{ block.settings.quote | escape }}</blockquote>
+              <figcaption class="mg-tm__author">
+                {%- if block.settings.image != blank -%}
+                  {%- render 'responsive-image', image: block.settings.image, sizes: '56px', class: 'mg-tm__avatar', widths: '56,112', aspect_ratio: '1/1' -%}
+                {%- endif -%}
+                <span>
+                  {%- if block.settings.name != blank -%}<span class="mg-tm__name">{{ block.settings.name | escape }}</span>{%- endif -%}
+                  {%- if block.settings.role != blank -%}<span class="mg-tm__role">{{ block.settings.role | escape }}</span>{%- endif -%}
+                </span>
+              </figcaption>
+            </figure>
+          </li>
+        {%- endfor -%}
+      </ul>
+      <button class="mg-carousel__arrow mg-carousel__arrow--next" type="button" data-mg-carousel-next aria-label="{{ 'general.accessibility.next' | t }}">{%- render 'icon', name: 'chevron-right' -%}</button>
+    </mg-carousel>
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-tm { background: var(--mg-tm-bg, var(--mg-bg-section)); color: var(--mg-tm-text, var(--mg-text)); padding-block: var(--mg-tm-pad-top, var(--mg-section-spacing)) var(--mg-tm-pad-bottom, var(--mg-section-spacing)); }
+.mg-tm .mg-section-header__title { color: inherit; }
+.mg-tm__card { margin: 0; padding: var(--mg-space-7); background: var(--mg-bg-card); border: var(--mg-border-hairline) solid var(--mg-border-card); height: 100%; display: flex; flex-direction: column; gap: var(--mg-space-4); }
+.mg-tm__rating { color: var(--mg-gold); letter-spacing: 2px; }
+.mg-tm__quote { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); font-style: italic; line-height: var(--mg-lh-snug); color: var(--mg-text); margin: 0; flex: 1; }
+.mg-tm__author { display: flex; align-items: center; gap: var(--mg-space-3); }
+.mg-tm__avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.mg-tm__name { display: block; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); font-weight: 600; letter-spacing: var(--mg-track-wide); text-transform: uppercase; }
+.mg-tm__role { display: block; font-size: var(--mg-fs-caption); color: var(--mg-text-muted); }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "mg-tm-section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Acclaim" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "In their words" },
+    { "type": "range", "id": "per_view", "min": 1, "max": 4, "step": 1, "label": "Cards per view", "default": 3 },
+    { "type": "color", "id": "background", "label": "Background", "default": "#F2EFE7" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "range", "id": "rating", "min": 0, "max": 5, "step": 1, "label": "Rating", "default": 5 },
+        { "type": "textarea", "id": "quote", "label": "Quote", "default": "An heirloom in the making. The craftsmanship is beyond compare." },
+        { "type": "image_picker", "id": "image", "label": "Customer photo" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Isabella R." },
+        { "type": "text", "id": "role", "label": "Role / location", "default": "Verified Client" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [ { "name": "Testimonials", "blocks": [ { "type": "testimonial" }, { "type": "testimonial" }, { "type": "testimonial" } ] } ]
+}
+{% endschema %}

@@ -1,0 +1,29 @@
+{%- comment -%}
+  article-card.liquid — reusable editorial blog card.
+  Params: article (required), ratio (default 16/9), sizes, show_excerpt (default true)
+{%- endcomment -%}
+{%- liquid
+  assign ratio = ratio | default: '16/9'
+  assign card_sizes = sizes | default: '(min-width:990px) 33vw, 100vw'
+  assign show_excerpt = show_excerpt | default: true, allow_false: true
+-%}
+<article class="mg-article-card">
+  <a class="mg-article-card__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+    {%- if article.image -%}
+      {%- render 'responsive-image', image: article.image, sizes: card_sizes, class: 'mg-article-card__img', aspect_ratio: ratio -%}
+    {%- else -%}
+      <div class="mg-image-placeholder" style="aspect-ratio: {{ ratio }};">{{ 'image' | placeholder_svg_tag: 'mg-image-placeholder__svg' }}</div>
+    {%- endif -%}
+  </a>
+  <div class="mg-article-card__body">
+    <p class="mg-article-card__meta">
+      {%- if article.tags.size > 0 -%}<span class="mg-article-card__tag">{{ article.tags.first }}</span> · {% endif -%}
+      <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: '%B %d, %Y' }}</time>
+    </p>
+    <h3 class="mg-article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h3>
+    {%- if show_excerpt -%}
+      <p class="mg-article-card__excerpt">{{ article.excerpt_or_content | strip_html | truncatewords: 22 }}</p>
+    {%- endif -%}
+    <a class="mg-btn mg-btn--text mg-article-card__more" href="{{ article.url }}">{{ 'blog.read_more' | t | default: 'Read more' }}</a>
+  </div>
+</article>

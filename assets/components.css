@@ -242,6 +242,18 @@
 .mg-coll-card--below:hover .mg-coll-card__title { color: var(--mg-gold); }
 .mg-coll-card__content--below .mg-coll-card__cta { margin-top: var(--mg-space-2); }
 
+/* ---------- Article card (reusable) ---------- */
+.mg-article-card { display: flex; flex-direction: column; }
+.mg-article-card__media { display: block; overflow: hidden; margin-bottom: var(--mg-space-4); }
+.mg-article-card__img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--mg-dur-slow) var(--mg-ease); }
+.mg-article-card:hover .mg-article-card__img { transform: scale(1.04); }
+.mg-article-card__meta { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-text-muted); margin-bottom: var(--mg-space-2); }
+.mg-article-card__tag { color: var(--mg-gold); }
+.mg-article-card__title { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); font-weight: 400; line-height: var(--mg-lh-snug); margin-bottom: var(--mg-space-2); }
+.mg-article-card__title a { color: var(--mg-text); }
+.mg-article-card__title a:hover { color: var(--mg-gold); }
+.mg-article-card__excerpt { color: var(--mg-text-secondary); font-size: var(--mg-fs-body-sm); line-height: var(--mg-lh-body); margin-bottom: var(--mg-space-3); }
+
 /* ---------- Carousel (reusable, slider.js) ---------- */
 .mg-carousel { position: relative; }
 .mg-carousel__track {

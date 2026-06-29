@@ -123,7 +123,67 @@
         "h2": { "type": "hotspot", "settings": { "x": 65, "y": 60 } }
       },
       "block_order": ["h1", "h2"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": { "eyebrow": "Acclaim", "heading": "In their words", "per_view": 3 },
+      "blocks": {
+        "t1": { "type": "testimonial" },
+        "t2": { "type": "testimonial", "settings": { "name": "Sophia L." } },
+        "t3": { "type": "testimonial", "settings": { "name": "Marcus A." } }
+      },
+      "block_order": ["t1", "t2", "t3"]
+    },
+    "featured-brands": {
+      "type": "logo-list",
+      "settings": { "heading": "Our Partners", "style": "brands", "columns": 5, "background": "#FBF8F2" },
+      "blocks": { "b1": { "type": "logo" }, "b2": { "type": "logo" }, "b3": { "type": "logo" }, "b4": { "type": "logo" }, "b5": { "type": "logo" } },
+      "block_order": ["b1", "b2", "b3", "b4", "b5"]
+    },
+    "press": {
+      "type": "logo-list",
+      "settings": { "eyebrow": "Press", "heading": "As Seen In", "style": "press", "columns": 4, "background": "#F2EFE7" },
+      "blocks": { "p1": { "type": "logo" }, "p2": { "type": "logo" }, "p3": { "type": "logo" }, "p4": { "type": "logo" } },
+      "block_order": ["p1", "p2", "p3", "p4"]
+    },
+    "awards": {
+      "type": "awards",
+      "settings": { "eyebrow": "Recognition", "heading": "Awards & Honours" },
+      "blocks": {
+        "a1": { "type": "award" },
+        "a2": { "type": "award", "settings": { "year": "2024", "title": "Excellence in Craftsmanship" } },
+        "a3": { "type": "award", "settings": { "year": "2023", "title": "Sustainable Luxury Award" } }
+      },
+      "block_order": ["a1", "a2", "a3"]
+    },
+    "journal": {
+      "type": "journal",
+      "settings": { "eyebrow": "Journal", "heading": "Stories & Inspiration", "post_limit": 3, "columns": 3 }
+    },
+    "instagram": {
+      "type": "instagram",
+      "settings": { "heading": "Follow the Journey", "handle": "@madrishiglobal", "columns": 6 },
+      "blocks": { "i1": { "type": "post" }, "i2": { "type": "post" }, "i3": { "type": "post" }, "i4": { "type": "post" }, "i5": { "type": "post" }, "i6": { "type": "post" } },
+      "block_order": ["i1", "i2", "i3", "i4", "i5", "i6"]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": { "layout": "dark", "heading": "Join the House of Madrishi" }
+    },
+    "cta-banner": {
+      "type": "editorial-banner",
+      "settings": { "full_width": true, "height": "medium", "content_x": "center", "content_y": "middle", "heading": "The Art of Gifting", "overlay_opacity": 40, "button_1_text": "Discover gifts" }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": { "eyebrow": "Support", "heading": "Frequently Asked Questions" },
+      "blocks": { "q1": { "type": "qa" }, "q2": { "type": "qa", "settings": { "question": "What is your returns policy?" } }, "q3": { "type": "qa", "settings": { "question": "Do you ship internationally?" } } },
+      "block_order": ["q1", "q2", "q3"]
+    },
+    "footer-cta": {
+      "type": "footer-cta",
+      "settings": { "heading": "Begin your Madrishi journey", "button_text": "Explore the collection", "button_style": "secondary" }
     }
   },
-  "order": ["hero", "brand-philosophy", "featured-collections", "editorial-banner", "product-showcase", "craftsmanship", "global-map", "founder-story", "lookbook", "shop-the-look"]
+  "order": ["hero", "brand-philosophy", "featured-collections", "editorial-banner", "product-showcase", "craftsmanship", "global-map", "founder-story", "lookbook", "shop-the-look", "testimonials", "featured-brands", "press", "awards", "journal", "instagram", "newsletter", "cta-banner", "faq", "footer-cta"]
 }
