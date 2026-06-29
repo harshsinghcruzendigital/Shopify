@@ -1,0 +1,20 @@
+{%- comment -%}
+  recently-viewed-product.liquid — helper section.
+  Not placed in any template. Fetched via the Section Rendering API in a
+  product's context: /products/{handle}?section_id=recently-viewed-product
+  Returns one product-card <li> for the recently-viewed carousel.
+{%- endcomment -%}
+<li class="mg-recently-viewed__item" data-mg-rv-item>
+  {%- render 'product-card',
+    product: product,
+    image_ratio: '3/4',
+    show_vendor: false,
+    show_rating: true,
+    show_swatches: true,
+    show_quick_view: true,
+    sizes: '(min-width: 990px) 25vw, 60vw'
+  -%}
+</li>
+{% schema %}
+{ "name": "Recently viewed card" }
+{% endschema %}

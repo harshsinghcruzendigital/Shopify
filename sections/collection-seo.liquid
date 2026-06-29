@@ -1,0 +1,144 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Collection SEO Content
+  Long-form SEO/editorial copy with an accessible expand/collapse
+  "Read more". Optimised reading typography. Defaults its content to
+  the collection description, fully overridable. Custom element:
+  <mg-readmore>
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign content = section.settings.content
+  if content == blank and section.settings.use_collection_description
+    assign content = collection.description
+  endif
+-%}
+
+{%- if content != blank or section.settings.heading != blank -%}
+  <section
+    class="mg-seo {% if section.settings.alignment == 'center' %}mg-seo--center{% endif %} {{ section.settings.custom_class }}"
+    id="{{ section.settings.anchor_id | default: section.id }}"
+    style="
+      --mg-seo-bg: {{ section.settings.background }};
+      --mg-seo-text: {{ section.settings.text_color }};
+      --mg-seo-pad-top: {{ section.settings.padding_top }}px;
+      --mg-seo-pad-bottom: {{ section.settings.padding_bottom }}px;
+    "
+    {% if section.settings.animate %}data-mg-animate-section{% endif %}
+  >
+    <div class="mg-seo__inner mg-container {% if section.settings.narrow %}mg-container--narrow{% endif %}">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="mg-seo__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="mg-seo__heading" data-mg-animate>{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if content != blank -%}
+        {%- if section.settings.collapsible -%}
+          <mg-readmore class="mg-seo__readmore" data-collapsed-height="{{ section.settings.collapsed_height }}" data-mg-animate>
+            <div class="mg-seo__body rte" data-mg-readmore-content style="--mg-seo-collapsed: {{ section.settings.collapsed_height }}px;">{{ content }}</div>
+            <button class="mg-btn mg-btn--text mg-seo__toggle" type="button" aria-expanded="false" data-mg-readmore-toggle>
+              <span data-mg-readmore-label>{{ section.settings.expand_label | default: 'Read more' | escape }}</span>
+            </button>
+          </mg-readmore>
+        {%- else -%}
+          <div class="mg-seo__body rte" data-mg-animate>{{ content }}</div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+.mg-seo { background: var(--mg-seo-bg, transparent); color: var(--mg-seo-text, var(--mg-text)); padding-block: var(--mg-seo-pad-top, var(--mg-space-12)) var(--mg-seo-pad-bottom, var(--mg-space-12)); }
+.mg-seo--center { text-align: center; }
+.mg-seo__eyebrow { margin-bottom: var(--mg-space-3); }
+.mg-seo__heading { font-size: var(--mg-fs-section); font-weight: 300; line-height: var(--mg-lh-heading); margin-bottom: var(--mg-space-5); color: inherit; }
+.mg-seo__body { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); color: var(--mg-text-secondary); }
+.mg-seo__body > * + * { margin-top: var(--mg-space-4); }
+.mg-seo__body h2, .mg-seo__body h3, .mg-seo__body h4 { color: var(--mg-text); margin-top: var(--mg-space-7); }
+.mg-seo__body a { color: var(--mg-navy); border-bottom: 1px solid var(--mg-gold); }
+.mg-seo__body a:hover { color: var(--mg-gold); }
+
+/* Read more */
+.mg-seo__readmore { display: block; }
+.mg-seo__readmore[data-collapsed="true"] .mg-seo__body {
+  max-height: var(--mg-seo-collapsed, 200px);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+}
+.mg-seo__toggle { margin-top: var(--mg-space-5); }
+.mg-seo--center .mg-seo__readmore { display: flex; flex-direction: column; align-items: center; }
+
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% javascript %}
+class MGReadMore extends HTMLElement {
+  connectedCallback() {
+    this.content = this.querySelector('[data-mg-readmore-content]');
+    this.toggle = this.querySelector('[data-mg-readmore-toggle]');
+    this.label = this.querySelector('[data-mg-readmore-label]');
+    if (!this.content || !this.toggle) return;
+
+    this.expandLabel = this.label.textContent;
+    this.collapseLabel = this.dataset.collapseLabel || 'Read less';
+
+    // Only collapse if the content actually overflows the clamp.
+    const clamp = parseInt(this.dataset.collapsedHeight, 10) || 200;
+    if (this.content.scrollHeight <= clamp + 10) {
+      this.toggle.hidden = true;
+      return;
+    }
+    this.setAttribute('data-collapsed', 'true');
+    this.toggle.addEventListener('click', () => this._toggle());
+  }
+
+  _toggle() {
+    const collapsed = this.getAttribute('data-collapsed') === 'true';
+    this.setAttribute('data-collapsed', String(!collapsed));
+    this.toggle.setAttribute('aria-expanded', String(collapsed));
+    this.label.textContent = collapsed ? this.collapseLabel : this.expandLabel;
+  }
+}
+if (!customElements.get('mg-readmore')) customElements.define('mg-readmore', MGReadMore);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Collection SEO content",
+  "tag": "section",
+  "class": "mg-seo-section",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "checkbox", "id": "use_collection_description", "label": "Use collection description", "default": true, "info": "Used when no custom content is set" },
+    { "type": "richtext", "id": "content", "label": "Content" },
+
+    { "type": "header", "content": "Read more" },
+    { "type": "checkbox", "id": "collapsible", "label": "Collapse long content", "default": true },
+    { "type": "range", "id": "collapsed_height", "min": 80, "max": 400, "step": 20, "unit": "px", "label": "Collapsed height", "default": 200 },
+    { "type": "text", "id": "expand_label", "label": "Expand label", "default": "Read more" },
+
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "select", "id": "alignment", "label": "Alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" } ], "default": "left" },
+    { "type": "checkbox", "id": "narrow", "label": "Narrow reading width", "default": true },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Heading color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 8, "unit": "px", "label": "Padding top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 8, "unit": "px", "label": "Padding bottom", "default": 96 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "checkbox", "id": "animate", "label": "Animate on scroll", "default": true },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "presets": [ { "name": "Collection SEO content" } ]
+}
+{% endschema %}

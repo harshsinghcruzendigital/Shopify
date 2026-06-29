@@ -94,6 +94,25 @@
     };
   })();
 
+  /* ---------- Recently-viewed history (localStorage) ---------- */
+  MG.recentlyViewed = {
+    key: 'mg-recently-viewed',
+    max: 20,
+    get() {
+      try { return JSON.parse(localStorage.getItem(this.key)) || []; } catch (e) { return []; }
+    },
+    add(handle) {
+      if (!handle) return;
+      let list = this.get().filter((h) => h !== handle);
+      list.unshift(handle);
+      list = list.slice(0, this.max);
+      try { localStorage.setItem(this.key, JSON.stringify(list)); } catch (e) {}
+    }
+  };
+  // Auto-track: any page that declares the current product handle.
+  const pmeta = document.querySelector('meta[name="mg:product-handle"]');
+  if (pmeta && pmeta.content) MG.recentlyViewed.add(pmeta.content);
+
   // Shopify section lifecycle (Theme Editor) — components self-init via
   // connectedCallback, but expose a hook for non-custom-element listeners.
   if (typeof Shopify !== 'undefined' && Shopify.designMode) {

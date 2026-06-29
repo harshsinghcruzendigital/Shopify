@@ -1,0 +1,120 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Recently Viewed Products
+  Carousel of the shopper's browsing history (localStorage). Cards are
+  real Liquid product-cards fetched via the Section Rendering API
+  (recently-viewed-product), so no card markup is duplicated in JS.
+  Hides itself when there is no history. Custom element:
+  <mg-recently-viewed>
+  ============================================================
+{%- endcomment -%}
+
+<section
+  class="mg-recently {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-recently-bg: {{ section.settings.background }};
+    --mg-recently-text: {{ section.settings.text_color }};
+    --mg-recently-pad-top: {{ section.settings.padding_top }}px;
+    --mg-recently-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <mg-recently-viewed
+    class="mg-recently__el"
+    data-limit="{{ section.settings.product_limit }}"
+    data-section="recently-viewed-product"
+    {% if request.page_type == 'product' %}data-current="{{ product.handle }}"{% endif %}
+    hidden
+  >
+    <div class="mg-recently__inner mg-container">
+      <div class="mg-section-header mg-section-header--center">
+        {%- if section.settings.eyebrow != blank -%}<p class="mg-section-header__eyebrow mg-eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="mg-section-header__title">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+      </div>
+
+      <mg-carousel class="mg-carousel" style="--mg-carousel-item-d: calc(25% - var(--mg-space-5));">
+        <button class="mg-carousel__arrow mg-carousel__arrow--prev" type="button" data-mg-carousel-prev aria-label="{{ 'general.accessibility.previous' | t }}">{%- render 'icon', name: 'chevron-left' -%}</button>
+        <ul class="mg-carousel__track" data-mg-carousel-track data-mg-rv-track role="list"></ul>
+        <button class="mg-carousel__arrow mg-carousel__arrow--next" type="button" data-mg-carousel-next aria-label="{{ 'general.accessibility.next' | t }}">{%- render 'icon', name: 'chevron-right' -%}</button>
+      </mg-carousel>
+    </div>
+  </mg-recently-viewed>
+</section>
+
+{% stylesheet %}
+.mg-recently { background: var(--mg-recently-bg, transparent); color: var(--mg-recently-text, var(--mg-text)); }
+.mg-recently__el { display: block; padding-block: var(--mg-recently-pad-top, var(--mg-section-spacing)) var(--mg-recently-pad-bottom, var(--mg-section-spacing)); }
+.mg-recently .mg-section-header__title { color: inherit; }
+{% endstyle %}
+
+{% javascript %}
+class MGRecentlyViewed extends HTMLElement {
+  connectedCallback() {
+    this.track = this.querySelector('[data-mg-rv-track]');
+    this.sectionType = this.dataset.section;
+    this.limit = parseInt(this.dataset.limit, 10) || 8;
+    this.current = this.dataset.current || null;
+    if (!this.track || !(window.MG && MG.recentlyViewed)) return;
+    this._render();
+  }
+
+  async _render() {
+    let handles = MG.recentlyViewed.get();
+    if (this.current) handles = handles.filter((h) => h !== this.current);
+    handles = handles.slice(0, this.limit);
+    if (!handles.length) return; // stays hidden
+
+    try {
+      const results = await Promise.all(
+        handles.map((h) =>
+          fetch(`/products/${encodeURIComponent(h)}?section_id=${this.sectionType}`)
+            .then((r) => (r.ok ? r.text() : ''))
+            .catch(() => '')
+        )
+      );
+      const frag = document.createDocumentFragment();
+      results.forEach((html) => {
+        if (!html) return;
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const item = doc.querySelector('[data-mg-rv-item]');
+        if (item) frag.appendChild(document.importNode(item, true));
+      });
+      if (!frag.childNodes.length) return;
+      this.track.appendChild(frag);
+      this.hidden = false;
+      // Refresh carousel arrow state now that items exist.
+      const carousel = this.querySelector('mg-carousel');
+      if (carousel && typeof carousel._update === 'function') carousel._update();
+    } catch (e) {
+      /* stay hidden on failure */
+    }
+  }
+}
+if (!customElements.get('mg-recently-viewed')) customElements.define('mg-recently-viewed', MGRecentlyViewed);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Recently viewed",
+  "tag": "section",
+  "class": "mg-recently-section",
+  "settings": [
+    { "type": "paragraph", "content": "Shows each visitor the products they have recently viewed. Empty until a shopper browses products." },
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Continue browsing" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Recently viewed" },
+    { "type": "range", "id": "product_limit", "min": 2, "max": 12, "step": 1, "label": "Maximum products", "default": 8 },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 8, "unit": "px", "label": "Padding top", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 8, "unit": "px", "label": "Padding bottom", "default": 96 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "presets": [ { "name": "Recently viewed" } ]
+}
+{% endschema %}

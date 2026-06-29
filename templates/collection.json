@@ -32,7 +32,60 @@
         "show_grid_toggle": true,
         "show_filters": true
       }
+    },
+    "editorial-banner": {
+      "type": "editorial-banner",
+      "settings": {
+        "full_width": true,
+        "height": "medium",
+        "content_x": "left",
+        "content_y": "bottom",
+        "heading": "The Heritage Collection",
+        "overlay_opacity": 30
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "Curated",
+        "heading": "Editor's Picks",
+        "layout": "carousel",
+        "columns": 4,
+        "product_limit": 8
+      }
+    },
+    "collection-seo": {
+      "type": "collection-seo",
+      "settings": {
+        "use_collection_description": true,
+        "collapsible": true,
+        "narrow": true
+      }
+    },
+    "related-collections": {
+      "type": "related-collections",
+      "settings": {
+        "eyebrow": "Explore",
+        "heading": "You may also like",
+        "layout": "grid",
+        "columns": 3,
+        "card_style": "overlay"
+      },
+      "blocks": {
+        "c1": { "type": "collection" },
+        "c2": { "type": "collection" },
+        "c3": { "type": "collection" }
+      },
+      "block_order": ["c1", "c2", "c3"]
+    },
+    "recently-viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "eyebrow": "Continue browsing",
+        "heading": "Recently viewed",
+        "product_limit": 8
+      }
     }
   },
-  "order": ["collection-hero", "collection-story", "product-grid"]
+  "order": ["collection-hero", "collection-story", "product-grid", "editorial-banner", "featured-collection", "collection-seo", "related-collections", "recently-viewed"]
 }
