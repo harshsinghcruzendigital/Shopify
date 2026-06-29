@@ -279,6 +279,38 @@
 @media (max-width: 989px) { .mg-carousel__track { grid-auto-columns: calc(40% - var(--mg-space-4)); } .mg-carousel__arrow { display: none; } }
 @media (max-width: 767px) { .mg-carousel__track { grid-auto-columns: calc(64% - var(--mg-space-3)); gap: var(--mg-space-4); } }
 
+/* ---------- Drawer (reusable right-side panel: wishlist, cart) ---------- */
+.mg-drawer { position: fixed; inset: 0; z-index: var(--mg-z-drawer); }
+.mg-drawer[hidden] { display: none; }
+.mg-drawer__overlay { position: absolute; inset: 0; background: var(--mg-overlay); opacity: 0; transition: opacity var(--mg-dur-base) var(--mg-ease); }
+.mg-drawer.is-open .mg-drawer__overlay { opacity: 1; }
+.mg-drawer__panel {
+  position: absolute; top: 0; bottom: 0; right: 0;
+  width: min(440px, 92vw);
+  display: flex; flex-direction: column;
+  background: var(--mg-bg-card);
+  transform: translateX(100%);
+  transition: transform var(--mg-dur-base) var(--mg-ease);
+  box-shadow: var(--mg-shadow-lg);
+}
+.mg-drawer.is-open .mg-drawer__panel { transform: translateX(0); }
+.mg-drawer__head { display: flex; align-items: center; justify-content: space-between; padding: var(--mg-space-5); border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-drawer__title { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); margin: 0; }
+.mg-drawer__close { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; color: var(--mg-navy); }
+.mg-drawer__close:hover { color: var(--mg-gold); }
+.mg-drawer__body { flex: 1; overflow-y: auto; padding: var(--mg-space-5); }
+.mg-drawer__foot { padding: var(--mg-space-5); border-top: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-drawer__empty { text-align: center; color: var(--mg-text-secondary); padding-block: var(--mg-space-10); display: flex; flex-direction: column; gap: var(--mg-space-4); align-items: center; }
+@media (prefers-reduced-motion: reduce) { .mg-drawer__panel, .mg-drawer__overlay { transition: none; } }
+
+/* Wishlist drawer grid */
+.mg-wishlist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--mg-space-5); list-style: none; margin: 0; padding: 0; }
+
+/* ---------- Social icons (reusable) ---------- */
+.mg-social { display: flex; align-items: center; gap: var(--mg-space-3); }
+.mg-social__link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; color: currentColor; transition: color var(--mg-dur-base) var(--mg-ease); }
+.mg-social__link:hover { color: var(--mg-gold); }
+
 /* ---------- Shared section header ---------- */
 .mg-section-header { margin-bottom: var(--mg-space-9); }
 .mg-section-header__eyebrow { margin-bottom: var(--mg-space-3); }

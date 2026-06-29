@@ -1,26 +1,73 @@
 {%- comment -%}
-  header-menu.liquid — desktop navigation list with up to 3 levels of
-  dropdowns. Param: menu (a linklist). Mega menu enhancement lands in
-  Component 3; this is the accessible baseline (hover + focus-within).
+  header-menu.liquid — desktop navigation. Renders a full-width MEGA
+  panel for any top-level item that has a matching "Mega menu" header
+  block (by title); otherwise a standard dropdown; otherwise a link.
+  Params:
+    menu   (linklist)
+    blocks (section.blocks — optional, for mega panels)
 {%- endcomment -%}
 {%- if menu != blank -%}
   <ul class="mg-header__menu">
     {%- for link in menu.links -%}
-      {%- assign has_children = false -%}
-      {%- if link.links.size > 0 -%}{%- assign has_children = true -%}{%- endif -%}
-      <li class="mg-header__item {% if has_children %}has-dropdown{% endif %}">
+      {%- liquid
+        assign has_children = false
+        if link.links.size > 0
+          assign has_children = true
+        endif
+        assign mega = null
+        if blocks
+          for b in blocks
+            if b.type == 'mega_menu' and b.settings.menu_title == link.title
+              assign mega = b
+            endif
+          endfor
+        endif
+      -%}
+      <li class="mg-header__item {% if mega and has_children %}has-mega{% elsif has_children %}has-dropdown{% endif %}">
         <a
           href="{{ link.url }}"
           class="mg-header__link"
-          {% if link.current %}aria-current="page"{% endif %}
-          {% if has_children %}aria-haspopup="true" aria-expanded="false"{% endif %}
+          {% if link.current or link.child_active %}aria-current="page"{% endif %}
+          {% if has_children %}aria-haspopup="true" aria-expanded="false" data-mg-nav-trigger{% endif %}
         >
           {{ link.title | escape }}
           {%- if has_children -%}{%- render 'icon', name: 'chevron-down', size: 14 -%}{%- endif -%}
         </a>
 
-        {%- if has_children -%}
-          <div class="mg-header__dropdown">
+        {%- if mega and has_children -%}
+          {%- comment -%} ---------- Mega panel ---------- {%- endcomment -%}
+          <div class="mg-mega" data-mg-nav-panel>
+            <div class="mg-mega__inner mg-container">
+              <div class="mg-mega__columns" style="--mega-cols: {{ mega.settings.columns }};">
+                {%- for child in link.links -%}
+                  <div class="mg-mega__col">
+                    <a class="mg-mega__col-title" href="{{ child.url }}">{{ child.title | escape }}</a>
+                    {%- if child.links.size > 0 -%}
+                      <ul class="mg-mega__col-list">
+                        {%- for grandchild in child.links -%}
+                          <li><a class="mg-mega__col-link" href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                {%- endfor -%}
+
+                {%- if mega.settings.promo_image != blank -%}
+                  <a class="mg-mega__promo" href="{{ mega.settings.promo_link | default: '#' }}">
+                    {%- render 'responsive-image', image: mega.settings.promo_image, sizes: '320px', class: 'mg-mega__promo-img', widths: '320,480,640,960', aspect_ratio: '4/5' -%}
+                    <span class="mg-mega__promo-content">
+                      {%- if mega.settings.promo_heading != blank -%}<span class="mg-mega__promo-heading">{{ mega.settings.promo_heading | escape }}</span>{%- endif -%}
+                      {%- if mega.settings.promo_cta != blank -%}<span class="mg-mega__promo-cta">{{ mega.settings.promo_cta | escape }}</span>{%- endif -%}
+                    </span>
+                  </a>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+
+        {%- elsif has_children -%}
+          {%- comment -%} ---------- Standard dropdown ---------- {%- endcomment -%}
+          <div class="mg-header__dropdown" data-mg-nav-panel>
             <ul>
               {%- for child in link.links -%}
                 <li class="{% if child.links.size > 0 %}has-subdropdown{% endif %}">

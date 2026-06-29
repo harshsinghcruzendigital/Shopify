@@ -55,6 +55,21 @@
     "country_label": "Country/region",
     "language_label": "Language"
   },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Your wishlist is empty.",
+    "continue": "Continue shopping"
+  },
+  "search": {
+    "placeholder": "Search for products, collections…",
+    "popular": "Popular searches",
+    "products": "Products",
+    "suggestions": "Suggestions",
+    "collections": "Collections",
+    "journal": "Journal",
+    "view_all": "View all results",
+    "no_results": "No results found for"
+  },
   "products": {
     "price": {
       "from": "From"

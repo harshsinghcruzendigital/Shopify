@@ -1,0 +1,21 @@
+{%- comment -%}
+  social-icons.liquid — reusable social links from theme settings.
+  Renders only the networks the merchant has filled in. Reused by the
+  mobile nav and footer. Param: class (optional extra class on the <ul>).
+{%- endcomment -%}
+{%- liquid
+  assign networks = ''
+  if settings.social_instagram != blank or settings.social_facebook != blank or settings.social_pinterest != blank or settings.social_tiktok != blank or settings.social_youtube != blank or settings.social_x != blank
+    assign networks = 'yes'
+  endif
+-%}
+{%- if networks != blank -%}
+  <ul class="mg-social {{ class }}">
+    {%- if settings.social_instagram != blank -%}<li><a class="mg-social__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">{%- render 'icon', name: 'instagram', size: 20 -%}</a></li>{%- endif -%}
+    {%- if settings.social_facebook != blank -%}<li><a class="mg-social__link" href="{{ settings.social_facebook }}" target="_blank" rel="noopener" aria-label="Facebook">{%- render 'icon', name: 'facebook', size: 20 -%}</a></li>{%- endif -%}
+    {%- if settings.social_pinterest != blank -%}<li><a class="mg-social__link" href="{{ settings.social_pinterest }}" target="_blank" rel="noopener" aria-label="Pinterest">{%- render 'icon', name: 'pinterest', size: 20 -%}</a></li>{%- endif -%}
+    {%- if settings.social_tiktok != blank -%}<li><a class="mg-social__link" href="{{ settings.social_tiktok }}" target="_blank" rel="noopener" aria-label="TikTok">{%- render 'icon', name: 'tiktok', size: 20 -%}</a></li>{%- endif -%}
+    {%- if settings.social_youtube != blank -%}<li><a class="mg-social__link" href="{{ settings.social_youtube }}" target="_blank" rel="noopener" aria-label="YouTube">{%- render 'icon', name: 'youtube', size: 20 -%}</a></li>{%- endif -%}
+    {%- if settings.social_x != blank -%}<li><a class="mg-social__link" href="{{ settings.social_x }}" target="_blank" rel="noopener" aria-label="X">{%- render 'icon', name: 'x', size: 20 -%}</a></li>{%- endif -%}
+  </ul>
+{%- endif -%}

@@ -1,0 +1,80 @@
+{%- comment -%}
+  mobile-nav.liquid — luxury slide-in mobile navigation drawer.
+  Rendered by header.liquid; opened via the MG.events 'mobile-nav:open'
+  hook fired by the header menu button. Accordion submenus, search,
+  account, wishlist, localization, featured image, social, CTA.
+  Param: menu (linklist).
+{%- endcomment -%}
+<mg-mobile-nav class="mg-mnav" id="mg-mobile-nav" hidden>
+  <div class="mg-mnav__overlay" data-mg-mnav-close></div>
+  <div class="mg-mnav__panel" role="dialog" aria-modal="true" aria-label="{{ 'general.accessibility.menu' | t }}">
+    <div class="mg-mnav__head">
+      <span class="mg-mnav__title">{{ 'general.accessibility.menu' | t }}</span>
+      <button class="mg-mnav__close" type="button" data-mg-mnav-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close' -%}</button>
+    </div>
+
+    <nav class="mg-mnav__nav" aria-label="{{ 'general.accessibility.primary_nav' | t }}">
+      <ul class="mg-mnav__menu">
+        {%- for link in menu.links -%}
+          <li class="mg-mnav__item">
+            {%- if link.links.size > 0 -%}
+              <div class="mg-mnav__row">
+                <a class="mg-mnav__link" href="{{ link.url }}">{{ link.title | escape }}</a>
+                <button class="mg-mnav__expand" type="button" aria-expanded="false" data-mg-mnav-toggle aria-label="{{ link.title | escape }}">{%- render 'icon', name: 'plus', size: 18 -%}{%- render 'icon', name: 'minus', size: 18 -%}</button>
+              </div>
+              <ul class="mg-mnav__submenu" hidden>
+                {%- for child in link.links -%}
+                  <li>
+                    <a class="mg-mnav__sublink" href="{{ child.url }}">{{ child.title | escape }}</a>
+                    {%- if child.links.size > 0 -%}
+                      <ul class="mg-mnav__subsubmenu">
+                        {%- for grandchild in child.links -%}
+                          <li><a class="mg-mnav__sublink mg-mnav__sublink--deep" href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- else -%}
+              <a class="mg-mnav__link" href="{{ link.url }}">{{ link.title | escape }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    {%- if section.settings.mobile_cta_text != blank -%}
+      <div class="mg-mnav__cta">
+        <a class="mg-btn mg-btn--primary" href="{{ section.settings.mobile_cta_link | default: '#' }}">{{ section.settings.mobile_cta_text | escape }}</a>
+      </div>
+    {%- endif -%}
+
+    <div class="mg-mnav__utils">
+      <a class="mg-mnav__util" href="{{ routes.search_url }}">{%- render 'icon', name: 'search', size: 18 -%}<span>{{ 'general.accessibility.search' | t }}</span></a>
+      <a class="mg-mnav__util" href="{{ routes.account_url }}">{%- render 'icon', name: 'user', size: 18 -%}<span>{{ 'general.accessibility.account' | t }}</span></a>
+      {%- if section.settings.show_wishlist -%}
+        <button class="mg-mnav__util" type="button" data-mg-wishlist-open>{%- render 'icon', name: 'heart', size: 18 -%}<span>{{ 'general.accessibility.wishlist' | t }}</span></button>
+      {%- endif -%}
+    </div>
+
+    {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+      <div class="mg-mnav__localization">
+        {%- render 'localization-form', type: 'country', id: 'mobile' -%}
+        {%- render 'localization-form', type: 'language', id: 'mobile' -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.mobile_image != blank -%}
+      <a class="mg-mnav__featured" href="{{ section.settings.mobile_image_link | default: '#' }}">
+        {%- render 'responsive-image', image: section.settings.mobile_image, sizes: '88vw', class: 'mg-mnav__featured-img', aspect_ratio: '16/9' -%}
+        {%- if section.settings.mobile_image_text != blank -%}<span class="mg-mnav__featured-text">{{ section.settings.mobile_image_text | escape }}</span>{%- endif -%}
+      </a>
+    {%- endif -%}
+
+    <div class="mg-mnav__foot">
+      {%- render 'social-icons', class: 'mg-mnav__social' -%}
+      {%- if section.settings.mobile_contact != blank -%}<p class="mg-mnav__contact">{{ section.settings.mobile_contact }}</p>{%- endif -%}
+    </div>
+  </div>
+</mg-mobile-nav>

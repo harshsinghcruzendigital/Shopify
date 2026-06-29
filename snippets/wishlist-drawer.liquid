@@ -1,0 +1,22 @@
+{%- comment -%}
+  wishlist-drawer.liquid — slide-in wishlist panel (reusable .mg-drawer
+  base). Opened via MG.events 'wishlist:open'. Saved products are
+  rendered as real cards via the Section Rendering API.
+{%- endcomment -%}
+<mg-wishlist-drawer class="mg-drawer mg-wishlist" id="mg-wishlist" hidden data-section="recently-viewed-product">
+  <div class="mg-drawer__overlay" data-mg-drawer-close></div>
+  <div class="mg-drawer__panel" role="dialog" aria-modal="true" aria-label="{{ 'general.accessibility.wishlist' | t }}">
+    <div class="mg-drawer__head">
+      <h2 class="mg-drawer__title">{{ 'wishlist.title' | t | default: 'Wishlist' }}</h2>
+      <button class="mg-drawer__close" type="button" data-mg-drawer-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close' -%}</button>
+    </div>
+    <div class="mg-drawer__body">
+      <div class="mg-drawer__empty" data-mg-wishlist-empty>
+        {%- render 'icon', name: 'heart', size: 32 -%}
+        <p>{{ 'wishlist.empty' | t | default: 'Your wishlist is empty.' }}</p>
+        <a class="mg-btn mg-btn--outline" href="{{ routes.all_products_collection_url }}">{{ 'wishlist.continue' | t | default: 'Continue shopping' }}</a>
+      </div>
+      <ul class="mg-wishlist-grid" data-mg-wishlist-body role="list"></ul>
+    </div>
+  </div>
+</mg-wishlist-drawer>

@@ -1,0 +1,65 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Predictive Search results
+  Rendered via the Section Rendering API:
+  /search/suggest?q={q}&section_id=predictive-search&resources[type]=...
+  Uses the `predictive_search` Liquid object so results are real markup.
+  ============================================================
+{%- endcomment -%}
+<div class="mg-predictive" data-mg-predictive>
+  {%- if predictive_search.performed -%}
+    {%- liquid
+      assign products = predictive_search.resources.products
+      assign collections = predictive_search.resources.collections
+      assign articles = predictive_search.resources.articles
+      assign queries = predictive_search.resources.queries
+      assign has_results = false
+      if products.size > 0 or collections.size > 0 or articles.size > 0 or queries.size > 0
+        assign has_results = true
+      endif
+    -%}
+
+    {%- if has_results -%}
+      <div class="mg-predictive__grid">
+        <div class="mg-predictive__col mg-predictive__col--main">
+          {%- if products.size > 0 -%}
+            <p class="mg-predictive__label">{{ 'search.products' | t | default: 'Products' }}</p>
+            <div class="mg-predictive__products">
+              {%- for product in products -%}{%- render 'search-item', product: product -%}{%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="mg-predictive__col mg-predictive__col--aside">
+          {%- if queries.size > 0 -%}
+            <p class="mg-predictive__label">{{ 'search.suggestions' | t | default: 'Suggestions' }}</p>
+            <ul class="mg-predictive__list">
+              {%- for q in queries -%}<li><a class="mg-predictive__link" href="{{ q.url }}">{{ q.styled_text }}</a></li>{%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if collections.size > 0 -%}
+            <p class="mg-predictive__label">{{ 'search.collections' | t | default: 'Collections' }}</p>
+            <ul class="mg-predictive__list">
+              {%- for collection in collections -%}<li><a class="mg-predictive__link" href="{{ collection.url }}">{{ collection.title | escape }}</a></li>{%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if articles.size > 0 -%}
+            <p class="mg-predictive__label">{{ 'search.journal' | t | default: 'Journal' }}</p>
+            <ul class="mg-predictive__list">
+              {%- for article in articles -%}<li><a class="mg-predictive__link" href="{{ article.url }}">{{ article.title | escape }}</a></li>{%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <a class="mg-predictive__view-all mg-btn mg-btn--text" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}">
+        {{ 'search.view_all' | t | default: 'View all results' }} &rarr;
+      </a>
+    {%- else -%}
+      <p class="mg-predictive__empty">{{ 'search.no_results' | t | default: 'No results found for' }} &ldquo;{{ predictive_search.terms | escape }}&rdquo;</p>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+{% schema %}
+{ "name": "Predictive search" }
+{% endschema %}

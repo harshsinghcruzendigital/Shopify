@@ -1,0 +1,42 @@
+{%- comment -%}
+  search-drawer.liquid — full-width predictive search overlay.
+  Rendered by header.liquid; opened via MG.events 'search:open'.
+  Live results injected by <mg-search> via the predictive-search section.
+{%- endcomment -%}
+<mg-search class="mg-search" id="mg-search" hidden data-suggest-url="{{ routes.predictive_search_url }}" data-section="predictive-search">
+  <div class="mg-search__overlay" data-mg-search-close></div>
+  <div class="mg-search__panel" role="dialog" aria-modal="true" aria-label="{{ 'general.accessibility.search' | t }}">
+    <div class="mg-search__bar mg-container">
+      <form class="mg-search__form" action="{{ routes.search_url }}" method="get" role="search">
+        <span class="mg-search__icon">{%- render 'icon', name: 'search', size: 22 -%}</span>
+        <input
+          type="search"
+          name="q"
+          class="mg-search__input"
+          placeholder="{{ 'search.placeholder' | t | default: 'Search for products, collections…' }}"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          aria-label="{{ 'general.accessibility.search' | t }}"
+          data-mg-search-input
+        >
+        <button type="button" class="mg-search__close" data-mg-search-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close', size: 22 -%}</button>
+      </form>
+    </div>
+
+    <div class="mg-search__results mg-container" data-mg-search-results aria-live="polite">
+      {%- if section.settings.search_suggestions != blank -%}
+        <div class="mg-search__default" data-mg-search-default>
+          <p class="mg-predictive__label">{{ 'search.popular' | t | default: 'Popular searches' }}</p>
+          <ul class="mg-search__suggestions">
+            {%- assign terms = section.settings.search_suggestions | split: ',' -%}
+            {%- for term in terms -%}
+              {%- assign t = term | strip -%}
+              {%- if t != blank -%}<li><a class="mg-predictive__link" href="{{ routes.search_url }}?q={{ t | url_encode }}">{{ t }}</a></li>{%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</mg-search>

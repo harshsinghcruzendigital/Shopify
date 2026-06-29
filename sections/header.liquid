@@ -54,7 +54,7 @@
 
       {%- if section.settings.layout == 'logo-left' -%}
         <nav class="mg-header__nav mg-hide-mobile" aria-label="{{ 'general.accessibility.primary_nav' | t | default: 'Primary' }}">
-          {%- render 'header-menu', menu: section.settings.menu -%}
+          {%- render 'header-menu', menu: section.settings.menu, blocks: section.blocks -%}
         </nav>
       {%- endif -%}
     </div>
@@ -149,7 +149,7 @@
   {%- if section.settings.layout == 'logo-center' -%}
     <nav class="mg-header__nav mg-header__nav--row mg-hide-mobile" aria-label="{{ 'general.accessibility.primary_nav' | t | default: 'Primary' }}">
       <div class="mg-container">
-        {%- render 'header-menu', menu: section.settings.menu -%}
+        {%- render 'header-menu', menu: section.settings.menu, blocks: section.blocks -%}
       </div>
     </nav>
   {%- endif -%}
@@ -157,6 +157,10 @@
 
 {%- comment -%} Sentinel for sticky/transparent scroll detection (no layout cost) {%- endcomment -%}
 <div class="mg-header__sentinel" aria-hidden="true"></div>
+
+{%- render 'mobile-nav', menu: section.settings.menu -%}
+{%- if section.settings.show_search -%}{%- render 'search-drawer' -%}{%- endif -%}
+{%- if section.settings.show_wishlist -%}{%- render 'wishlist-drawer' -%}{%- endif -%}
 
 {% stylesheet %}
 .mg-header {
@@ -272,6 +276,132 @@
 .mg-header__subdropdown { padding-left: var(--mg-space-3); }
 .mg-header__subdropdown a { color: var(--mg-text-secondary); font-size: var(--mg-fs-caption); }
 
+/* Mega menu — full-width panel anchored to the nav */
+.mg-header__nav { position: relative; }
+.mg-header__item.has-mega { position: static; }
+.mg-mega {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: var(--mg-white);
+  border-top: var(--mg-border-hairline) solid var(--mg-border-divider);
+  box-shadow: var(--mg-shadow-md);
+  opacity: 0; visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--mg-dur-base) var(--mg-ease), transform var(--mg-dur-base) var(--mg-ease), visibility var(--mg-dur-base);
+  z-index: var(--mg-z-dropdown);
+}
+.mg-header__item.has-mega:hover > .mg-mega,
+.mg-header__item.has-mega:focus-within > .mg-mega { opacity: 1; visibility: visible; transform: translateY(0); }
+.mg-mega__inner { padding-block: var(--mg-space-8); }
+.mg-mega__columns { display: grid; grid-template-columns: repeat(var(--mega-cols, 4), minmax(0, 1fr)); gap: var(--mg-space-8); align-items: start; }
+.mg-mega__col-title { display: block; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); font-weight: 600; letter-spacing: var(--mg-track-wider); text-transform: uppercase; color: var(--mg-navy); margin-bottom: var(--mg-space-3); }
+.mg-mega__col-title:hover { color: var(--mg-gold); }
+.mg-mega__col-list { display: flex; flex-direction: column; gap: var(--mg-space-2); }
+.mg-mega__col-link { font-family: var(--mg-font-body); font-size: var(--mg-fs-body-sm); color: var(--mg-text-secondary); text-transform: none; letter-spacing: 0; }
+.mg-mega__col-link:hover { color: var(--mg-gold); }
+.mg-mega__promo { position: relative; display: block; overflow: hidden; }
+.mg-mega__promo-img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--mg-dur-slow) var(--mg-ease); }
+.mg-mega__promo:hover .mg-mega__promo-img { transform: scale(1.05); }
+.mg-mega__promo-content { position: absolute; left: 0; right: 0; bottom: 0; padding: var(--mg-space-4); color: var(--mg-ivory); background: linear-gradient(to top, rgba(17,24,43,0.6), transparent); }
+.mg-mega__promo-heading { display: block; font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); }
+.mg-mega__promo-cta { display: inline-block; margin-top: var(--mg-space-1); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; border-bottom: 1px solid currentColor; }
+
+/* ---------- Mobile nav drawer ---------- */
+.mg-mnav { position: fixed; inset: 0; z-index: var(--mg-z-drawer); }
+.mg-mnav[hidden] { display: none; }
+.mg-mnav__overlay { position: absolute; inset: 0; background: var(--mg-overlay); opacity: 0; transition: opacity var(--mg-dur-base) var(--mg-ease); }
+.mg-mnav.is-open .mg-mnav__overlay { opacity: 1; }
+.mg-mnav__panel {
+  position: absolute; top: 0; bottom: 0; left: 0;
+  width: min(420px, 88vw);
+  display: flex; flex-direction: column;
+  background: var(--mg-bg-card);
+  padding: var(--mg-space-5) var(--mg-space-5) var(--mg-space-8);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform var(--mg-dur-base) var(--mg-ease);
+  box-shadow: var(--mg-shadow-lg);
+}
+.mg-mnav.is-open .mg-mnav__panel { transform: translateX(0); }
+.mg-mnav__head { display: flex; align-items: center; justify-content: space-between; padding-bottom: var(--mg-space-4); border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); margin-bottom: var(--mg-space-3); }
+.mg-mnav__title { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wider); text-transform: uppercase; color: var(--mg-text-muted); }
+.mg-mnav__close { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; color: var(--mg-navy); }
+
+.mg-mnav__item { border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-mnav__row { display: flex; align-items: center; justify-content: space-between; }
+.mg-mnav__link { display: block; flex: 1; padding: var(--mg-space-4) 0; font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); color: var(--mg-navy); }
+.mg-mnav__expand { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; color: var(--mg-navy); }
+.mg-mnav__expand .mg-icon--minus { display: none; }
+.mg-mnav__expand[aria-expanded="true"] .mg-icon--plus { display: none; }
+.mg-mnav__expand[aria-expanded="true"] .mg-icon--minus { display: block; }
+.mg-mnav__submenu { padding: 0 0 var(--mg-space-4) var(--mg-space-3); display: flex; flex-direction: column; gap: var(--mg-space-2); }
+.mg-mnav__sublink { display: block; padding: var(--mg-space-1) 0; font-size: var(--mg-fs-body); color: var(--mg-text-secondary); }
+.mg-mnav__sublink:hover { color: var(--mg-gold); }
+.mg-mnav__subsubmenu { padding-left: var(--mg-space-4); margin-top: var(--mg-space-1); }
+.mg-mnav__sublink--deep { font-size: var(--mg-fs-body-sm); }
+
+.mg-mnav__cta { margin: var(--mg-space-5) 0; }
+.mg-mnav__cta .mg-btn { width: 100%; }
+.mg-mnav__utils { display: flex; flex-direction: column; gap: var(--mg-space-1); padding: var(--mg-space-4) 0; border-top: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-mnav__util { display: flex; align-items: center; gap: var(--mg-space-3); padding: var(--mg-space-2) 0; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-navy); }
+.mg-mnav__util:hover { color: var(--mg-gold); }
+.mg-mnav__localization { display: flex; flex-direction: column; gap: var(--mg-space-2); padding: var(--mg-space-4) 0; border-top: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-mnav__featured { display: block; position: relative; margin: var(--mg-space-5) 0; overflow: hidden; }
+.mg-mnav__featured-text { position: absolute; left: var(--mg-space-4); bottom: var(--mg-space-4); color: var(--mg-ivory); font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); }
+.mg-mnav__foot { margin-top: auto; padding-top: var(--mg-space-5); }
+.mg-mnav__contact { margin-top: var(--mg-space-3); font-size: var(--mg-fs-body-sm); color: var(--mg-text-secondary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-mnav__panel, .mg-mnav__overlay { transition: none; }
+}
+
+/* ---------- Predictive search overlay ---------- */
+.mg-search { position: fixed; inset: 0; z-index: var(--mg-z-modal); }
+.mg-search[hidden] { display: none; }
+.mg-search__overlay { position: absolute; inset: 0; background: var(--mg-overlay); opacity: 0; transition: opacity var(--mg-dur-base) var(--mg-ease); }
+.mg-search.is-open .mg-search__overlay { opacity: 1; }
+.mg-search__panel {
+  position: absolute; top: 0; left: 0; right: 0;
+  background: var(--mg-bg-card);
+  padding-block: var(--mg-space-5) var(--mg-space-8);
+  max-height: 90vh; overflow-y: auto;
+  transform: translateY(-100%);
+  transition: transform var(--mg-dur-base) var(--mg-ease);
+  box-shadow: var(--mg-shadow-lg);
+}
+.mg-search.is-open .mg-search__panel { transform: translateY(0); }
+.mg-search__form { display: flex; align-items: center; gap: var(--mg-space-3); border-bottom: var(--mg-border-thick) solid var(--mg-navy); padding-bottom: var(--mg-space-3); }
+.mg-search__icon { display: inline-flex; color: var(--mg-navy); }
+.mg-search__input { flex: 1; border: 0; background: transparent; font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); color: var(--mg-text); padding: var(--mg-space-2) 0; }
+.mg-search__input:focus { outline: none; }
+.mg-search__close { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; color: var(--mg-navy); }
+.mg-search__close:hover { color: var(--mg-gold); }
+.mg-search__results { margin-top: var(--mg-space-6); }
+.mg-search__suggestions { display: flex; flex-wrap: wrap; gap: var(--mg-space-3); }
+
+.mg-predictive__grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--mg-space-9); }
+.mg-predictive__label { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); font-weight: 600; letter-spacing: var(--mg-track-wider); text-transform: uppercase; color: var(--mg-text-muted); margin-bottom: var(--mg-space-4); }
+.mg-predictive__products { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--mg-space-4); }
+.mg-search-item { display: flex; align-items: center; gap: var(--mg-space-3); }
+.mg-search-item__media { flex: 0 0 64px; width: 64px; }
+.mg-search-item__img { width: 64px; height: 64px; object-fit: cover; }
+.mg-search-item__title { display: block; font-size: var(--mg-fs-body-sm); color: var(--mg-text); }
+.mg-search-item:hover .mg-search-item__title { color: var(--mg-gold); }
+.mg-search-item__price { font-size: var(--mg-fs-body-sm); }
+.mg-predictive__list { display: flex; flex-direction: column; gap: var(--mg-space-2); margin-bottom: var(--mg-space-6); }
+.mg-predictive__link { font-size: var(--mg-fs-body-sm); color: var(--mg-text-secondary); }
+.mg-predictive__link:hover { color: var(--mg-gold); }
+.mg-predictive__view-all { margin-top: var(--mg-space-6); }
+.mg-predictive__empty { color: var(--mg-text-secondary); }
+.mg-search__results.is-loading { opacity: var(--mg-opacity-muted); }
+
+@media (max-width: 767px) {
+  .mg-predictive__grid { grid-template-columns: 1fr; gap: var(--mg-space-6); }
+  .mg-predictive__products { grid-template-columns: 1fr; }
+  .mg-search__input { font-size: var(--mg-fs-body-lg); }
+}
+@media (prefers-reduced-motion: reduce) { .mg-search__panel, .mg-search__overlay { transition: none; } }
+
 /* Localization */
 .mg-localization__wrap { position: relative; }
 .mg-localization__current {
@@ -370,6 +500,23 @@ class MGHeader extends HTMLElement {
     this._wireTrigger('[data-mg-search-open]', 'search:open');
     this._wireTrigger('[data-mg-wishlist-open]', 'wishlist:open');
     this._wireTrigger('[data-mg-cart-open]', 'cart:open');
+
+    this._initNav();
+  }
+
+  _initNav() {
+    this.querySelectorAll('.mg-header__item').forEach((item) => {
+      const trigger = item.querySelector('[data-mg-nav-trigger]');
+      if (!trigger) return;
+      const setState = (open) => trigger.setAttribute('aria-expanded', String(open));
+      item.addEventListener('mouseenter', () => setState(true));
+      item.addEventListener('mouseleave', () => setState(false));
+      item.addEventListener('focusin', () => setState(true));
+      item.addEventListener('focusout', (e) => { if (!item.contains(e.relatedTarget)) setState(false); });
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { setState(false); trigger.focus(); }
+      });
+    });
   }
 
   disconnectedCallback() { window.removeEventListener('scroll', this._onScroll); }
@@ -424,6 +571,128 @@ class MGLocalization extends HTMLElement {
   close() { this.list.hidden = true; this.toggle.setAttribute('aria-expanded', 'false'); }
 }
 if (!customElements.get('mg-localization')) customElements.define('mg-localization', MGLocalization);
+
+class MGMobileNav extends HTMLElement {
+  connectedCallback() {
+    this.panel = this.querySelector('.mg-mnav__panel');
+    this.trap = window.MG ? new MG.FocusTrap(this.panel) : null;
+
+    if (window.MG && MG.events) MG.events.on('mobile-nav:open', () => this.open());
+
+    this.addEventListener('click', (e) => {
+      if (e.target.closest('[data-mg-mnav-close]')) return this.close();
+      const toggle = e.target.closest('[data-mg-mnav-toggle]');
+      if (toggle) return this._toggle(toggle);
+    });
+    this.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.close(); });
+  }
+
+  open() {
+    this.hidden = false;
+    requestAnimationFrame(() => this.classList.add('is-open'));
+    document.body.style.overflow = 'hidden';
+    document.querySelector('[data-mg-menu-open]')?.setAttribute('aria-expanded', 'true');
+    if (this.trap) this.trap.activate();
+  }
+  close() {
+    this.classList.remove('is-open');
+    document.body.style.overflow = '';
+    document.querySelector('[data-mg-menu-open]')?.setAttribute('aria-expanded', 'false');
+    if (this.trap) this.trap.deactivate();
+    const done = () => { this.hidden = true; this.panel.removeEventListener('transitionend', done); };
+    if (window.MG && MG.utils.prefersReducedMotion()) { this.hidden = true; }
+    else this.panel.addEventListener('transitionend', done);
+  }
+
+  _toggle(btn) {
+    const submenu = btn.closest('.mg-mnav__item').querySelector('.mg-mnav__submenu');
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    if (submenu) submenu.hidden = open;
+  }
+}
+if (!customElements.get('mg-mobile-nav')) customElements.define('mg-mobile-nav', MGMobileNav);
+
+class MGSearch extends HTMLElement {
+  connectedCallback() {
+    this.panel = this.querySelector('.mg-search__panel');
+    this.input = this.querySelector('[data-mg-search-input]');
+    this.results = this.querySelector('[data-mg-search-results]');
+    this.defaultState = this.querySelector('[data-mg-search-default]');
+    this.suggestUrl = this.dataset.suggestUrl;
+    this.sectionId = this.dataset.section;
+    this.trap = window.MG ? new MG.FocusTrap(this.panel) : null;
+
+    if (window.MG && MG.events) MG.events.on('search:open', () => this.open());
+
+    this.addEventListener('click', (e) => { if (e.target.closest('[data-mg-search-close]')) this.close(); });
+    this.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.close();
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') this._arrow(e);
+    });
+
+    this._search = (window.MG ? MG.utils.debounce : (f) => f)(() => this._fetch(), 250);
+    if (this.input) this.input.addEventListener('input', () => this._search());
+  }
+
+  open() {
+    this.hidden = false;
+    requestAnimationFrame(() => this.classList.add('is-open'));
+    document.body.style.overflow = 'hidden';
+    document.querySelector('[data-mg-search-open]')?.setAttribute('aria-expanded', 'true');
+    if (this.trap) this.trap.activate();
+    setTimeout(() => this.input && this.input.focus(), 80);
+  }
+  close() {
+    this.classList.remove('is-open');
+    document.body.style.overflow = '';
+    document.querySelector('[data-mg-search-open]')?.setAttribute('aria-expanded', 'false');
+    if (this.trap) this.trap.deactivate();
+    const done = () => { this.hidden = true; this.panel.removeEventListener('transitionend', done); };
+    if (window.MG && MG.utils.prefersReducedMotion()) this.hidden = true;
+    else this.panel.addEventListener('transitionend', done);
+  }
+
+  async _fetch() {
+    const q = this.input.value.trim();
+    if (q.length < 2) { this._restoreDefault(); return; }
+    if (this._controller) this._controller.abort();
+    this._controller = new AbortController();
+    this.results.classList.add('is-loading');
+    const url = `${this.suggestUrl}?q=${encodeURIComponent(q)}&section_id=${this.sectionId}` +
+      `&resources[type]=product,collection,article,query&resources[limit]=6`;
+    try {
+      const res = await fetch(url, { signal: this._controller.signal });
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+      const block = doc.querySelector('[data-mg-predictive]');
+      if (this.defaultState) this.defaultState.hidden = true;
+      this.results.querySelector('[data-mg-predictive]')?.remove();
+      if (block) this.results.appendChild(document.importNode(block, true));
+    } catch (e) {
+      if (e.name !== 'AbortError') { /* leave previous results */ }
+    } finally {
+      this.results.classList.remove('is-loading');
+    }
+  }
+
+  _restoreDefault() {
+    this.results.querySelector('[data-mg-predictive]')?.remove();
+    if (this.defaultState) this.defaultState.hidden = false;
+  }
+
+  _arrow(e) {
+    const links = Array.from(this.results.querySelectorAll('a'));
+    if (!links.length) return;
+    e.preventDefault();
+    const idx = links.indexOf(document.activeElement);
+    let next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+    if (next < 0) next = links.length - 1;
+    if (next >= links.length) next = 0;
+    links[next].focus();
+  }
+}
+if (!customElements.get('mg-search')) customElements.define('mg-search', MGSearch);
 {% endjavascript %}
 
 {% schema %}
@@ -469,8 +738,36 @@ if (!customElements.get('mg-localization')) customElements.define('mg-localizati
     { "type": "checkbox", "id": "show_localization", "label": "Show country/currency selector", "default": false },
     { "type": "checkbox", "id": "show_language", "label": "Show language selector", "default": false },
 
+    { "type": "header", "content": "Search" },
+    { "type": "text", "id": "search_suggestions", "label": "Popular searches", "info": "Comma-separated terms shown before typing", "default": "New arrivals, Bestsellers, Gifts" },
+
+    { "type": "header", "content": "Mobile menu" },
+    { "type": "text", "id": "mobile_cta_text", "label": "CTA label" },
+    { "type": "url", "id": "mobile_cta_link", "label": "CTA link" },
+    { "type": "image_picker", "id": "mobile_image", "label": "Featured image" },
+    { "type": "text", "id": "mobile_image_text", "label": "Featured image text" },
+    { "type": "url", "id": "mobile_image_link", "label": "Featured image link" },
+    { "type": "text", "id": "mobile_contact", "label": "Contact line", "info": "e.g. concierge@madrishi.com" },
+
     { "type": "header", "content": "Advanced" },
     { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
-  ]
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "Mega menu",
+      "settings": [
+        { "type": "paragraph", "content": "Turns a top-level menu item into a full-width mega menu. Its 2nd-level links become column headings and 3rd-level links become the column links." },
+        { "type": "text", "id": "menu_title", "label": "Menu item title", "info": "Must exactly match a top-level item in the chosen menu" },
+        { "type": "range", "id": "columns", "min": 2, "max": 6, "step": 1, "label": "Columns", "default": 4 },
+        { "type": "header", "content": "Promo (optional)" },
+        { "type": "image_picker", "id": "promo_image", "label": "Promo image" },
+        { "type": "text", "id": "promo_heading", "label": "Promo heading" },
+        { "type": "text", "id": "promo_cta", "label": "Promo call to action" },
+        { "type": "url", "id": "promo_link", "label": "Promo link" }
+      ]
+    }
+  ],
+  "max_blocks": 8
 }
 {% endschema %}

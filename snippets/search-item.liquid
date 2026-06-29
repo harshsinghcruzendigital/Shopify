@@ -1,0 +1,17 @@
+{%- comment -%}
+  search-item.liquid — compact product result row for predictive search.
+  Param: product
+{%- endcomment -%}
+<a class="mg-search-item" href="{{ product.url }}">
+  <span class="mg-search-item__media">
+    {%- if product.featured_media -%}
+      {%- render 'responsive-image', image: product.featured_media.preview_image, sizes: '72px', class: 'mg-search-item__img', widths: '72,144,216', aspect_ratio: '1/1' -%}
+    {%- else -%}
+      <span class="mg-image-placeholder" style="aspect-ratio:1/1;">{{ 'product-1' | placeholder_svg_tag }}</span>
+    {%- endif -%}
+  </span>
+  <span class="mg-search-item__info">
+    <span class="mg-search-item__title">{{ product.title | escape }}</span>
+    {%- render 'price', product: product, class: 'mg-search-item__price', show_compare: false -%}
+  </span>
+</a>
