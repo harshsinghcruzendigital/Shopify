@@ -96,7 +96,34 @@
         "p4": { "type": "pin", "settings": { "label": "Tokyo", "x": 84, "y": 44 } }
       },
       "block_order": ["p1", "p2", "p3", "p4"]
+    },
+    "founder-story": {
+      "type": "founder-story",
+      "settings": {
+        "portrait_position": "left",
+        "eyebrow": "The Founder",
+        "name": "Amara Devi",
+        "title": "Founder & Creative Director"
+      }
+    },
+    "lookbook": {
+      "type": "lookbook",
+      "settings": { "eyebrow": "Lookbook", "heading": "The Edit", "columns": 3 },
+      "blocks": {
+        "l1": { "type": "image" }, "l2": { "type": "image" }, "l3": { "type": "image" },
+        "l4": { "type": "image" }, "l5": { "type": "image" }, "l6": { "type": "image" }
+      },
+      "block_order": ["l1", "l2", "l3", "l4", "l5", "l6"]
+    },
+    "shop-the-look": {
+      "type": "shop-the-look",
+      "settings": { "eyebrow": "Shop the Look", "heading": "Styled by Madrishi", "image_ratio": "16/9" },
+      "blocks": {
+        "h1": { "type": "hotspot", "settings": { "x": 35, "y": 45 } },
+        "h2": { "type": "hotspot", "settings": { "x": 65, "y": 60 } }
+      },
+      "block_order": ["h1", "h2"]
     }
   },
-  "order": ["hero", "brand-philosophy", "featured-collections", "editorial-banner", "product-showcase", "craftsmanship", "global-map"]
+  "order": ["hero", "brand-philosophy", "featured-collections", "editorial-banner", "product-showcase", "craftsmanship", "global-map", "founder-story", "lookbook", "shop-the-look"]
 }

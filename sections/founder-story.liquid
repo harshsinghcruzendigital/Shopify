@@ -1,0 +1,109 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Homepage Section 08: Founder Story
+  Editorial portrait + large pull quote + narrative + founder
+  name/title + signature. Split layout. No section JS.
+  ============================================================
+{%- endcomment -%}
+
+<section
+  class="mg-founder mg-founder--portrait-{{ section.settings.portrait_position }} {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-founder-bg: {{ section.settings.background }};
+    --mg-founder-text: {{ section.settings.text_color }};
+    --mg-founder-pad-top: {{ section.settings.padding_top }}px;
+    --mg-founder-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  data-mg-animate-section
+>
+  <div class="mg-founder__inner mg-container">
+    <div class="mg-founder__grid">
+      <div class="mg-founder__portrait" data-mg-animate>
+        {%- if section.settings.image != blank -%}
+          {%- render 'responsive-image', image: section.settings.image, mobile: section.settings.image_mobile, sizes: '(min-width:990px) 45vw, 100vw', class: 'mg-founder__img', aspect_ratio: '4/5' -%}
+        {%- else -%}
+          <div class="mg-image-placeholder" style="aspect-ratio: 4/5;">{{ 'image' | placeholder_svg_tag }}</div>
+        {%- endif -%}
+      </div>
+
+      <div class="mg-founder__content">
+        {%- if section.settings.eyebrow != blank -%}<p class="mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        {%- if section.settings.quote != blank -%}
+          <blockquote class="mg-founder__quote" data-mg-animate>{{ section.settings.quote | escape }}</blockquote>
+        {%- endif -%}
+        {%- if section.settings.body != blank -%}<div class="mg-founder__body rte" data-mg-animate>{{ section.settings.body }}</div>{%- endif -%}
+
+        <div class="mg-founder__attribution" data-mg-animate>
+          {%- if section.settings.signature_image != blank -%}
+            {%- render 'responsive-image', image: section.settings.signature_image, sizes: '200px', class: 'mg-founder__signature', widths: '120,200,300,400' -%}
+          {%- endif -%}
+          {%- if section.settings.name != blank -%}<p class="mg-founder__name">{{ section.settings.name | escape }}</p>{%- endif -%}
+          {%- if section.settings.title != blank -%}<p class="mg-founder__title">{{ section.settings.title | escape }}</p>{%- endif -%}
+        </div>
+
+        {%- if section.settings.button_text != blank -%}
+          <a class="mg-btn mg-btn--outline mg-founder__cta" href="{{ section.settings.button_link | default: '#' }}" data-mg-animate>{{ section.settings.button_text | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-founder { background: var(--mg-founder-bg, var(--mg-bg-page)); color: var(--mg-founder-text, var(--mg-text)); padding-block: var(--mg-founder-pad-top, var(--mg-section-spacing)) var(--mg-founder-pad-bottom, var(--mg-section-spacing)); }
+.mg-founder__grid { display: grid; gap: var(--mg-space-10); align-items: center; }
+@media (min-width: 990px) {
+  .mg-founder__grid { grid-template-columns: 0.85fr 1fr; gap: var(--mg-space-12); }
+  .mg-founder--portrait-right .mg-founder__portrait { order: 2; }
+}
+.mg-founder__portrait { overflow: hidden; }
+.mg-founder__img { width: 100%; height: auto; display: block; }
+.mg-founder__quote { font-family: var(--mg-font-display); font-size: var(--mg-fs-section); font-weight: 300; font-style: italic; line-height: var(--mg-lh-snug); color: inherit; margin: 0 0 var(--mg-space-6); border: 0; padding: 0; }
+.mg-founder__body { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); color: var(--mg-text-secondary); }
+.mg-founder__body > * + * { margin-top: var(--mg-space-4); }
+.mg-founder__attribution { margin-top: var(--mg-space-7); }
+.mg-founder__signature { width: auto; max-height: 64px; margin-bottom: var(--mg-space-3); }
+.mg-founder__name { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); }
+.mg-founder__title { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-text-muted); margin-top: var(--mg-space-1); }
+.mg-founder__cta { margin-top: var(--mg-space-7); }
+
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Founder story",
+  "tag": "section",
+  "class": "mg-founder-section",
+  "settings": [
+    { "type": "header", "content": "Portrait" },
+    { "type": "select", "id": "portrait_position", "label": "Portrait position", "options": [ { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "image_picker", "id": "image", "label": "Portrait image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image" },
+
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Founder" },
+    { "type": "textarea", "id": "quote", "label": "Pull quote", "default": "I wanted to create pieces that outlive trends — heirlooms for a new generation." },
+    { "type": "richtext", "id": "body", "label": "Story", "default": "<p>What began as a single atelier has grown into a global house, yet our devotion to craft remains unchanged.</p>" },
+    { "type": "image_picker", "id": "signature_image", "label": "Signature image" },
+    { "type": "text", "id": "name", "label": "Founder name", "default": "Amara Devi" },
+    { "type": "text", "id": "title", "label": "Founder title", "default": "Founder & Creative Director" },
+    { "type": "text", "id": "button_text", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "presets": [ { "name": "Founder story" } ]
+}
+{% endschema %}

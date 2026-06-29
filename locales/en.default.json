@@ -109,7 +109,10 @@
     "card": {
       "add_wishlist": "Add to wishlist",
       "quick_view": "Quick view",
-      "out_of_5": "out of 5 stars"
+      "out_of_5": "out of 5 stars",
+      "add": "Add",
+      "view": "View",
+      "sold_out": "Sold out"
     }
   },
   "sections": {

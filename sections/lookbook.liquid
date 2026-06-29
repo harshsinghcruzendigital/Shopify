@@ -1,0 +1,194 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Homepage Section 09: Luxury Lookbook
+  Editorial masonry gallery (CSS columns) with hover captions and a
+  fullscreen lightbox (prev/next, keyboard, focus trap).
+  Custom element: <mg-lookbook>
+  ============================================================
+{%- endcomment -%}
+
+<section
+  class="mg-lookbook {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-look-bg: {{ section.settings.background }};
+    --mg-look-text: {{ section.settings.text_color }};
+    --mg-look-cols: {{ section.settings.columns }};
+    --mg-look-pad-top: {{ section.settings.padding_top }}px;
+    --mg-look-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  data-mg-animate-section
+>
+  <div class="mg-lookbook__inner mg-container">
+    {%- if section.settings.heading != blank or section.settings.eyebrow != blank -%}
+      <div class="mg-section-header mg-section-header--center">
+        {%- if section.settings.eyebrow != blank -%}<p class="mg-section-header__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="mg-section-header__title" data-mg-animate>{{ section.settings.heading | escape }}</h2>{%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <mg-lookbook class="mg-lookbook__el" data-mg-animate>
+      <div class="mg-lookbook__grid">
+        {%- for block in section.blocks -%}
+          {%- if block.settings.image != blank -%}
+            <figure class="mg-lookbook__item" {{ block.shopify_attributes }}>
+              <button
+                class="mg-lookbook__open"
+                type="button"
+                data-mg-lightbox-open
+                data-index="{{ forloop.index0 }}"
+                data-full="{{ block.settings.image | image_url: width: 2000 }}"
+                data-caption="{{ block.settings.caption | escape }}"
+                aria-label="{{ block.settings.caption | default: 'View image' | escape }}"
+              >
+                {%- render 'responsive-image', image: block.settings.image, sizes: '(min-width:990px) 25vw, 50vw', class: 'mg-lookbook__img' -%}
+              </button>
+              {%- if block.settings.caption != blank or block.settings.link != blank -%}
+                <figcaption class="mg-lookbook__caption">
+                  {%- if block.settings.caption != blank -%}<span>{{ block.settings.caption | escape }}</span>{%- endif -%}
+                  {%- if block.settings.link != blank -%}<a class="mg-lookbook__shop" href="{{ block.settings.link }}">{{ block.settings.link_text | default: 'Shop' | escape }}</a>{%- endif -%}
+                </figcaption>
+              {%- endif -%}
+            </figure>
+          {%- endif -%}
+        {%- else -%}
+          {%- for i in (1..6) -%}<figure class="mg-lookbook__item"><div class="mg-image-placeholder" style="aspect-ratio: 3/4;">{{ 'lifestyle-1' | placeholder_svg_tag }}</div></figure>{%- endfor -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="mg-lookbook__lightbox" data-mg-lightbox hidden role="dialog" aria-modal="true" aria-label="{{ section.settings.heading | default: 'Lookbook' | escape }}">
+        <button class="mg-lookbook__lb-close" type="button" data-mg-lightbox-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close' -%}</button>
+        <button class="mg-lookbook__lb-arrow mg-lookbook__lb-arrow--prev" type="button" data-mg-lightbox-prev aria-label="{{ 'general.accessibility.previous' | t }}">{%- render 'icon', name: 'chevron-left' -%}</button>
+        <figure class="mg-lookbook__lb-figure">
+          <img class="mg-lookbook__lb-img" data-mg-lightbox-img alt="" />
+          <figcaption class="mg-lookbook__lb-caption" data-mg-lightbox-caption></figcaption>
+        </figure>
+        <button class="mg-lookbook__lb-arrow mg-lookbook__lb-arrow--next" type="button" data-mg-lightbox-next aria-label="{{ 'general.accessibility.next' | t }}">{%- render 'icon', name: 'chevron-right' -%}</button>
+      </div>
+    </mg-lookbook>
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-lookbook { background: var(--mg-look-bg, var(--mg-bg-page)); color: var(--mg-look-text, var(--mg-text)); padding-block: var(--mg-look-pad-top, var(--mg-section-spacing)) var(--mg-look-pad-bottom, var(--mg-section-spacing)); }
+.mg-lookbook .mg-section-header__title { color: inherit; }
+.mg-lookbook__grid { columns: var(--mg-look-cols, 3); column-gap: var(--mg-space-5); }
+.mg-lookbook__item { break-inside: avoid; margin: 0 0 var(--mg-space-5); position: relative; overflow: hidden; }
+.mg-lookbook__open { display: block; width: 100%; cursor: zoom-in; }
+.mg-lookbook__img { width: 100%; height: auto; display: block; transition: transform var(--mg-dur-slow) var(--mg-ease); }
+.mg-lookbook__item:hover .mg-lookbook__img { transform: scale(1.04); }
+.mg-lookbook__caption { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--mg-space-3); padding: var(--mg-space-4); color: var(--mg-ivory); background: linear-gradient(to top, rgba(17,24,43,0.6), transparent); font-size: var(--mg-fs-body-sm); opacity: 0; transition: opacity var(--mg-dur-base) var(--mg-ease); }
+.mg-lookbook__item:hover .mg-lookbook__caption, .mg-lookbook__open:focus-visible + .mg-lookbook__caption { opacity: 1; }
+.mg-lookbook__shop { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-ivory); border-bottom: 1px solid var(--mg-gold); white-space: nowrap; }
+
+/* Lightbox */
+.mg-lookbook__lightbox { position: fixed; inset: 0; z-index: var(--mg-z-modal); display: flex; align-items: center; justify-content: center; gap: var(--mg-space-4); padding: var(--mg-space-6); background: rgba(17,24,43,0.94); opacity: 0; transition: opacity var(--mg-dur-base) var(--mg-ease); }
+.mg-lookbook__lightbox[hidden] { display: none; }
+.mg-lookbook__lightbox.is-open { opacity: 1; }
+.mg-lookbook__lb-figure { margin: 0; max-width: min(1100px, 90vw); max-height: 86vh; display: flex; flex-direction: column; align-items: center; }
+.mg-lookbook__lb-img { max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain; }
+.mg-lookbook__lb-caption { color: var(--mg-ivory); font-size: var(--mg-fs-body-sm); margin-top: var(--mg-space-3); text-align: center; }
+.mg-lookbook__lb-caption:empty { display: none; }
+.mg-lookbook__lb-close { position: absolute; top: var(--mg-space-5); right: var(--mg-space-5); width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; color: var(--mg-ivory); }
+.mg-lookbook__lb-arrow { width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; color: var(--mg-ivory); flex: 0 0 auto; opacity: 0.8; }
+.mg-lookbook__lb-arrow:hover { opacity: 1; }
+
+@media (max-width: 989px) { .mg-lookbook__grid { columns: 2; } }
+@media (max-width: 600px) { .mg-lookbook__grid { columns: 1; } .mg-lookbook__lb-arrow { position: absolute; bottom: var(--mg-space-6); } .mg-lookbook__lb-arrow--prev { left: var(--mg-space-5); } .mg-lookbook__lb-arrow--next { right: var(--mg-space-5); } }
+
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .mg-lookbook__img, .mg-lookbook__lightbox { transition: none; } [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% javascript %}
+class MGLookbook extends HTMLElement {
+  connectedCallback() {
+    this.lightbox = this.querySelector('[data-mg-lightbox]');
+    this.lbImg = this.querySelector('[data-mg-lightbox-img]');
+    this.lbCaption = this.querySelector('[data-mg-lightbox-caption]');
+    this.triggers = Array.from(this.querySelectorAll('[data-mg-lightbox-open]'));
+    this.items = this.triggers.map((t) => ({ full: t.dataset.full, caption: t.dataset.caption || '' }));
+    this.index = 0;
+    this.trap = window.MG ? new MG.FocusTrap(this.lightbox) : null;
+
+    this.triggers.forEach((t) => t.addEventListener('click', () => this.open(parseInt(t.dataset.index, 10))));
+    this.querySelector('[data-mg-lightbox-close]')?.addEventListener('click', () => this.close());
+    this.querySelector('[data-mg-lightbox-prev]')?.addEventListener('click', () => this.go(-1));
+    this.querySelector('[data-mg-lightbox-next]')?.addEventListener('click', () => this.go(1));
+    this.lightbox.addEventListener('click', (e) => { if (e.target === this.lightbox) this.close(); });
+    this.lightbox.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.close();
+      if (e.key === 'ArrowLeft') this.go(-1);
+      if (e.key === 'ArrowRight') this.go(1);
+    });
+  }
+  open(i) {
+    this.index = i;
+    this._render();
+    this.lightbox.hidden = false;
+    requestAnimationFrame(() => this.lightbox.classList.add('is-open'));
+    document.body.style.overflow = 'hidden';
+    if (this.trap) this.trap.activate();
+  }
+  close() {
+    this.lightbox.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (this.trap) this.trap.deactivate();
+    setTimeout(() => { this.lightbox.hidden = true; }, 320);
+  }
+  go(dir) {
+    if (!this.items.length) return;
+    this.index = (this.index + dir + this.items.length) % this.items.length;
+    this._render();
+  }
+  _render() {
+    const item = this.items[this.index];
+    if (!item) return;
+    this.lbImg.src = item.full;
+    this.lbImg.alt = item.caption;
+    this.lbCaption.textContent = item.caption;
+  }
+}
+if (!customElements.get('mg-lookbook')) customElements.define('mg-lookbook', MGLookbook);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Lookbook",
+  "tag": "section",
+  "class": "mg-lookbook-section",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Lookbook" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Edit" },
+    { "type": "range", "id": "columns", "min": 2, "max": 5, "step": 1, "label": "Columns", "default": 3 },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "caption", "label": "Caption" },
+        { "type": "url", "id": "link", "label": "Shop link" },
+        { "type": "text", "id": "link_text", "label": "Link text", "default": "Shop" }
+      ]
+    }
+  ],
+  "max_blocks": 16,
+  "presets": [
+    { "name": "Lookbook", "blocks": [ { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" } ] }
+  ]
+}
+{% endschema %}
