@@ -1,0 +1,41 @@
+<div class="mg-account">
+  <div class="mg-account__inner mg-account__inner--wide">
+    <div class="mg-account__head" style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+      <h1 class="mg-account__title" style="text-align:left;margin:0;">{{ 'customer.account.title' | t | default: 'My Account' }}</h1>
+      <a class="mg-btn mg-btn--text" href="{{ routes.account_logout_url }}">{{ 'customer.log_out' | t | default: 'Log out' }}</a>
+    </div>
+
+    <div class="mg-account__grid" style="margin-top:2rem;">
+      <aside>
+        <h2 style="font-family:var(--mg-font-eyebrow);font-size:var(--mg-fs-caption);letter-spacing:var(--mg-track-wide);text-transform:uppercase;">{{ 'customer.account.details' | t | default: 'Account details' }}</h2>
+        <p>{{ customer.name }}</p>
+        <p>{{ customer.email }}</p>
+        <a class="mg-btn mg-btn--text" href="{{ routes.account_addresses_url }}">{{ 'customer.addresses.title' | t | default: 'Addresses' }} ({{ customer.addresses_count }})</a>
+      </aside>
+
+      <div>
+        <h2 style="font-family:var(--mg-font-display);font-size:var(--mg-fs-card-heading);margin-bottom:1rem;">{{ 'customer.orders.title' | t | default: 'Order history' }}</h2>
+        {%- paginate customer.orders by 20 -%}
+          {%- if customer.orders.size > 0 -%}
+            <table class="mg-account__table">
+              <thead><tr><th>{{ 'customer.orders.order' | t | default: 'Order' }}</th><th>{{ 'customer.orders.date' | t | default: 'Date' }}</th><th>{{ 'customer.orders.payment' | t | default: 'Payment' }}</th><th>{{ 'customer.orders.total' | t | default: 'Total' }}</th></tr></thead>
+              <tbody>
+                {%- for order in customer.orders -%}
+                  <tr>
+                    <td><a href="{{ order.customer_url }}">{{ order.name }}</a></td>
+                    <td>{{ order.created_at | date: '%b %d, %Y' }}</td>
+                    <td>{{ order.financial_status_label }}</td>
+                    <td>{{ order.total_net_amount | money }}</td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+            {%- render 'pagination', paginate: paginate -%}
+          {%- else -%}
+            <p>{{ 'customer.orders.none' | t | default: 'You have not placed any orders yet.' }}</p>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+    </div>
+  </div>
+</div>

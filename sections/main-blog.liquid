@@ -1,0 +1,45 @@
+{%- comment -%} Madrishi Global — Blog listing (Part 9). article-card grid + pagination. {%- endcomment -%}
+<section class="mg-blog mg-section" id="MainBlog-{{ section.id }}" data-mg-animate-section style="--mg-blog-cols: {{ section.settings.columns }};">
+  <div class="mg-blog__inner mg-container">
+    <header class="mg-blog__header mg-section-header mg-section-header--center" data-mg-animate>
+      <p class="mg-eyebrow">{{ section.settings.eyebrow | default: 'Journal' | escape }}</p>
+      <h1 class="mg-section-header__title">{{ blog.title | escape }}</h1>
+    </header>
+
+    {%- paginate blog.articles by section.settings.posts_per_page -%}
+      {%- if blog.articles.size > 0 -%}
+        <div class="mg-blog__grid" data-mg-animate>
+          {%- for article in blog.articles -%}
+            {%- render 'article-card', article: article, ratio: section.settings.image_ratio -%}
+          {%- endfor -%}
+        </div>
+        {%- render 'pagination', paginate: paginate -%}
+      {%- else -%}
+        <p class="mg-blog__empty">{{ 'blog.empty' | t | default: 'No posts yet.' }}</p>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+{% stylesheet %}
+.mg-blog__header { margin-bottom: var(--mg-space-9); }
+.mg-blog__grid { display: grid; grid-template-columns: repeat(var(--mg-blog-cols, 3), minmax(0, 1fr)); gap: var(--mg-space-9); }
+.mg-blog__empty { text-align: center; color: var(--mg-text-secondary); padding-block: var(--mg-space-10); }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (max-width: 989px) { .mg-blog__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .mg-blog__grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+{% schema %}
+{
+  "name": "Blog posts",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Journal" },
+    { "type": "range", "id": "columns", "min": 2, "max": 4, "step": 1, "label": "Columns", "default": 3 },
+    { "type": "range", "id": "posts_per_page", "min": 6, "max": 24, "step": 3, "label": "Posts per page", "default": 9 },
+    { "type": "select", "id": "image_ratio", "label": "Image ratio", "options": [ { "value": "16/9", "label": "16:9" }, { "value": "4/3", "label": "4:3" }, { "value": "3/2", "label": "3:2" } ], "default": "16/9" }
+  ],
+  "enabled_on": { "templates": ["blog"] }
+}
+{% endschema %}

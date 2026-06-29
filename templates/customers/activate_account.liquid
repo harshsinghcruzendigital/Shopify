@@ -1,0 +1,12 @@
+<div class="mg-account">
+  <div class="mg-account__inner">
+    <h1 class="mg-account__title">{{ 'customer.activate.title' | t | default: 'Activate your account' }}</h1>
+    {%- form 'activate_customer_password', class: 'mg-account__form' -%}
+      {%- if form.errors -%}<div class="mg-account__errors">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <label class="mg-field"><span>{{ 'customer.reset.new_password' | t }}</span><input type="password" name="customer[password]" autocomplete="new-password" required></label>
+      <label class="mg-field"><span>{{ 'customer.reset.confirm' | t }}</span><input type="password" name="customer[password_confirmation]" autocomplete="new-password" required></label>
+      <button type="submit" class="mg-btn mg-btn--primary">{{ 'customer.activate.submit' | t | default: 'Activate account' }}</button>
+      <button type="submit" name="decline" class="mg-btn mg-btn--text">{{ 'customer.activate.decline' | t | default: 'Decline invitation' }}</button>
+    {%- endform -%}
+  </div>
+</div>

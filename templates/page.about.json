@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "page": { "type": "main-page", "settings": { "narrow": true, "center_heading": true } },
+    "philosophy": {
+      "type": "brand-philosophy",
+      "settings": { "eyebrow": "Our Philosophy", "heading": "Luxury is the quiet confidence of craftsmanship." },
+      "blocks": {
+        "mission": { "type": "pillar", "settings": { "label": "Mission" } },
+        "vision": { "type": "pillar", "settings": { "label": "Vision", "heading": "A global house of modern heritage" } }
+      },
+      "block_order": ["mission", "vision"]
+    },
+    "founder": {
+      "type": "founder-story",
+      "settings": { "eyebrow": "The Founder", "name": "Amara Devi", "title": "Founder & Creative Director" }
+    },
+    "craftsmanship": {
+      "type": "craftsmanship",
+      "settings": { "eyebrow": "Craftsmanship", "heading": "The making of a masterpiece" },
+      "blocks": {
+        "s1": { "type": "step", "settings": { "heading": "Sourcing" } },
+        "s2": { "type": "step", "settings": { "heading": "Design" } },
+        "s3": { "type": "step", "settings": { "heading": "Handcraft" } }
+      },
+      "block_order": ["s1", "s2", "s3"]
+    }
+  },
+  "order": ["page", "philosophy", "founder", "craftsmanship"]
+}

@@ -1,0 +1,28 @@
+<div class="mg-account">
+  <div class="mg-account__inner">
+    <h1 class="mg-account__title">{{ 'customer.login.title' | t | default: 'Login' }}</h1>
+
+    {%- form 'customer_login', class: 'mg-account__form' -%}
+      {%- if form.errors -%}<div class="mg-account__errors">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <label class="mg-field"><span>{{ 'customer.email' | t | default: 'Email' }}</span><input type="email" name="customer[email]" autocomplete="email" required></label>
+      {%- if form.password_needed -%}
+        <label class="mg-field"><span>{{ 'customer.password' | t | default: 'Password' }}</span><input type="password" name="customer[password]" autocomplete="current-password" required></label>
+      {%- endif -%}
+      <button type="submit" class="mg-btn mg-btn--primary">{{ 'customer.login.sign_in' | t | default: 'Sign in' }}</button>
+      <p class="mg-account__links"><a href="#recover" onclick="document.getElementById('recover').hidden=false;return false;">{{ 'customer.login.forgot' | t | default: 'Forgot your password?' }}</a></p>
+    {%- endform -%}
+
+    <div id="recover" hidden>
+      <h2 class="mg-account__title">{{ 'customer.recover.title' | t | default: 'Reset password' }}</h2>
+      {%- form 'recover_customer_password', class: 'mg-account__form' -%}
+        {%- if form.posted_successfully? -%}<p class="mg-contact__success">{{ 'customer.recover.success' | t | default: 'We have sent you an email.' }}</p>{%- endif -%}
+        <label class="mg-field"><span>{{ 'customer.email' | t }}</span><input type="email" name="email" required></label>
+        <button type="submit" class="mg-btn mg-btn--outline">{{ 'customer.recover.submit' | t | default: 'Send reset link' }}</button>
+      {%- endform -%}
+    </div>
+
+    {%- unless shop.checkout.guest_login -%}
+      <p class="mg-account__links">{{ 'customer.login.new' | t | default: 'New here?' }} <a href="{{ routes.account_register_url }}">{{ 'customer.login.create' | t | default: 'Create an account' }}</a></p>
+    {%- endunless -%}
+  </div>
+</div>

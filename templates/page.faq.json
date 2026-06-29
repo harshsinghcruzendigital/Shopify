@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "faq": {
+      "type": "faq",
+      "settings": { "eyebrow": "Support", "heading": "Frequently Asked Questions" },
+      "blocks": {
+        "q1": { "type": "qa" },
+        "q2": { "type": "qa", "settings": { "question": "What is your returns policy?" } },
+        "q3": { "type": "qa", "settings": { "question": "Do you ship internationally?" } }
+      },
+      "block_order": ["q1", "q2", "q3"]
+    }
+  },
+  "order": ["faq"]
+}

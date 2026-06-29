@@ -353,6 +353,27 @@
 .mg-social__link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; color: currentColor; transition: color var(--mg-dur-base) var(--mg-ease); }
 .mg-social__link:hover { color: var(--mg-gold); }
 
+/* ---------- Form fields (global) ---------- */
+.mg-field { display: flex; flex-direction: column; gap: var(--mg-space-2); }
+.mg-field > span, .mg-field > label { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; }
+.mg-field input, .mg-field textarea, .mg-field select { padding: var(--mg-space-3) var(--mg-space-4); border: var(--mg-border-hairline) solid var(--mg-border-input); background: var(--mg-white); font: inherit; border-radius: var(--mg-radius-xs); }
+.mg-field input:focus, .mg-field textarea:focus, .mg-field select:focus { outline: none; border-color: var(--mg-gold); }
+
+/* ---------- Customer / account pages ---------- */
+.mg-account { padding-block: var(--mg-section-spacing); }
+.mg-account__inner { max-width: 520px; margin-inline: auto; padding-inline: var(--mg-container-pad); }
+.mg-account__inner--wide { max-width: var(--mg-container); }
+.mg-account__title { font-size: var(--mg-fs-hero); font-weight: 300; text-align: center; margin-bottom: var(--mg-space-7); }
+.mg-account__form { display: flex; flex-direction: column; gap: var(--mg-space-4); }
+.mg-account__form .mg-btn { width: 100%; }
+.mg-account__links { text-align: center; margin-top: var(--mg-space-5); font-size: var(--mg-fs-body-sm); }
+.mg-account__links a { color: var(--mg-navy); border-bottom: 1px solid var(--mg-gold); }
+.mg-account__errors { color: var(--mg-error); font-size: var(--mg-fs-body-sm); margin-bottom: var(--mg-space-4); }
+.mg-account__table { width: 100%; border-collapse: collapse; }
+.mg-account__table th, .mg-account__table td { text-align: left; padding: var(--mg-space-3); border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); font-size: var(--mg-fs-body-sm); }
+.mg-account__grid { display: grid; gap: var(--mg-space-9); }
+@media (min-width: 768px) { .mg-account__grid { grid-template-columns: 1fr 2fr; } }
+
 /* ---------- Shared section header ---------- */
 .mg-section-header { margin-bottom: var(--mg-space-9); }
 .mg-section-header__eyebrow { margin-bottom: var(--mg-space-3); }

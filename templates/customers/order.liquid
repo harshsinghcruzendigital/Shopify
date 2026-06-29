@@ -1,0 +1,26 @@
+<div class="mg-account">
+  <div class="mg-account__inner mg-account__inner--wide">
+    <h1 class="mg-account__title">{{ 'customer.order.title' | t | default: 'Order' }} {{ order.name }}</h1>
+    <p style="text-align:center;color:var(--mg-text-muted);">{{ order.created_at | date: '%B %d, %Y' }} · {{ order.financial_status_label }} · {{ order.fulfillment_status_label }}</p>
+
+    <table class="mg-account__table" style="margin-top:2rem;">
+      <thead><tr><th>{{ 'customer.order.product' | t | default: 'Product' }}</th><th>{{ 'customer.order.qty' | t | default: 'Qty' }}</th><th>{{ 'customer.order.total' | t | default: 'Total' }}</th></tr></thead>
+      <tbody>
+        {%- for line in order.line_items -%}
+          <tr><td><a href="{{ line.product.url }}">{{ line.title | escape }}</a></td><td>{{ line.quantity }}</td><td>{{ line.final_line_price | money }}</td></tr>
+        {%- endfor -%}
+      </tbody>
+      <tfoot>
+        <tr><th colspan="2">{{ 'cart.subtotal' | t }}</th><td>{{ order.line_items_subtotal_price | money }}</td></tr>
+        <tr><th colspan="2">{{ 'customer.order.shipping' | t | default: 'Shipping' }}</th><td>{{ order.shipping_price | money }}</td></tr>
+        <tr><th colspan="2">{{ 'customer.order.total' | t }}</th><td>{{ order.total_net_amount | money }}</td></tr>
+      </tfoot>
+    </table>
+
+    <div class="mg-account__grid" style="margin-top:2rem;">
+      <div><h2 style="font-family:var(--mg-font-eyebrow);font-size:var(--mg-fs-caption);text-transform:uppercase;letter-spacing:var(--mg-track-wide);">{{ 'customer.order.billing' | t | default: 'Billing address' }}</h2>{{ order.billing_address | format_address }}</div>
+      <div><h2 style="font-family:var(--mg-font-eyebrow);font-size:var(--mg-fs-caption);text-transform:uppercase;letter-spacing:var(--mg-track-wide);">{{ 'customer.order.shipping_address' | t | default: 'Shipping address' }}</h2>{{ order.shipping_address | format_address }}</div>
+    </div>
+    <p class="mg-account__links"><a href="{{ routes.account_url }}">&larr; {{ 'customer.account.return' | t | default: 'Back to account' }}</a></p>
+  </div>
+</div>

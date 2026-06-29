@@ -64,7 +64,44 @@
     "aria": "Cookie consent"
   },
   "blog": {
-    "read_more": "Read more"
+    "read_more": "Read more",
+    "share": "Share",
+    "more": "More articles",
+    "empty": "No posts yet.",
+    "comments": "Comments",
+    "comment": "Comment",
+    "post_comment": "Post comment",
+    "comment_success": "Comment submitted."
+  },
+  "contact": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone (optional)",
+    "message": "Message",
+    "send": "Send message",
+    "success": "Thank you — we will be in touch shortly.",
+    "error": "Please check the form and try again."
+  },
+  "404": {
+    "code": "Error 404",
+    "home": "Return home",
+    "shop": "Shop all"
+  },
+  "customer": {
+    "email": "Email",
+    "password": "Password",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "log_out": "Log out",
+    "login": { "title": "Login", "sign_in": "Sign in", "forgot": "Forgot your password?", "new": "New here?", "create": "Create an account" },
+    "recover": { "title": "Reset password", "success": "We have sent you an email.", "submit": "Send reset link" },
+    "register": { "title": "Create account", "submit": "Create account", "have": "Already have an account?" },
+    "reset": { "title": "Reset your password", "new_password": "New password", "confirm": "Confirm password", "submit": "Reset password" },
+    "activate": { "title": "Activate your account", "submit": "Activate account", "decline": "Decline invitation" },
+    "account": { "title": "My Account", "details": "Account details", "return": "Back to account" },
+    "orders": { "title": "Order history", "order": "Order", "date": "Date", "payment": "Payment", "total": "Total", "none": "You have not placed any orders yet." },
+    "order": { "title": "Order", "product": "Product", "qty": "Qty", "total": "Total", "shipping": "Shipping", "billing": "Billing address", "shipping_address": "Shipping address" },
+    "addresses": { "title": "Addresses", "add": "Add a new address", "address1": "Address", "city": "City", "zip": "ZIP / Postal", "country": "Country", "save": "Save address", "saved": "Saved addresses", "default": "Default" }
   },
   "newsletter": {
     "email": "Email",
@@ -97,6 +134,8 @@
     "free_shipping_reached": "You have unlocked complimentary shipping."
   },
   "search": {
+    "title": "Search",
+    "results_for": "results for",
     "placeholder": "Search for products, collections…",
     "popular": "Popular searches",
     "products": "Products",

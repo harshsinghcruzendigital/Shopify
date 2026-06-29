@@ -1,0 +1,35 @@
+{%- comment -%} Madrishi Global — 404 (Part 9). {%- endcomment -%}
+<section class="mg-404 mg-section" id="Main404-{{ section.id }}">
+  <div class="mg-404__inner mg-container mg-container--narrow">
+    <p class="mg-eyebrow">{{ '404.code' | t | default: 'Error 404' }}</p>
+    <h1 class="mg-404__title">{{ section.settings.heading | default: 'This page has wandered off.' | escape }}</h1>
+    {%- if section.settings.text != blank -%}<div class="mg-404__text rte">{{ section.settings.text }}</div>{%- endif -%}
+    <div class="mg-404__actions">
+      <a class="mg-btn mg-btn--primary" href="{{ routes.root_url }}">{{ '404.home' | t | default: 'Return home' }}</a>
+      <a class="mg-btn mg-btn--outline" href="{{ routes.all_products_collection_url }}">{{ '404.shop' | t | default: 'Shop all' }}</a>
+    </div>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="mg-404__search">
+      <input type="search" name="q" placeholder="{{ 'search.placeholder' | t }}" aria-label="{{ 'general.accessibility.search' | t }}">
+      <button type="submit" class="mg-btn mg-btn--text">{{ 'general.accessibility.search' | t }}</button>
+    </form>
+  </div>
+</section>
+{% stylesheet %}
+.mg-404__inner { text-align: center; padding-block: var(--mg-space-12); }
+.mg-404__title { font-size: var(--mg-fs-display); font-weight: 300; line-height: var(--mg-lh-tight); margin: var(--mg-space-3) 0 var(--mg-space-5); }
+.mg-404__text { color: var(--mg-text-secondary); margin-bottom: var(--mg-space-7); }
+.mg-404__actions { display: flex; gap: var(--mg-space-3); justify-content: center; flex-wrap: wrap; margin-bottom: var(--mg-space-7); }
+.mg-404__search { display: flex; gap: var(--mg-space-2); max-width: 420px; margin-inline: auto; }
+.mg-404__search input { flex: 1; height: 48px; padding: 0 var(--mg-space-4); border: var(--mg-border-hairline) solid var(--mg-border-input); }
+{% endstyle %}
+{% schema %}
+{
+  "name": "404",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "This page has wandered off." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>The page you are looking for is no longer here.</p>" }
+  ],
+  "enabled_on": { "templates": ["404"] }
+}
+{% endschema %}

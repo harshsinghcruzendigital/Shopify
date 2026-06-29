@@ -1,0 +1,63 @@
+{%- comment -%} Madrishi Global — Search results (Part 9). {%- endcomment -%}
+<section class="mg-search-results mg-section" id="MainSearch-{{ section.id }}" data-mg-animate-section style="--mg-cols: {{ section.settings.columns }};">
+  <div class="mg-search-results__inner mg-container">
+    <header class="mg-search-results__header" data-mg-animate>
+      <h1 class="mg-search-results__title">{{ 'search.title' | t | default: 'Search' }}</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="mg-search-results__form">
+        <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'search.placeholder' | t }}" aria-label="{{ 'general.accessibility.search' | t }}">
+        <button type="submit" class="mg-btn mg-btn--primary">{{ 'general.accessibility.search' | t }}</button>
+      </form>
+      {%- if search.performed -%}
+        <p class="mg-search-results__count">{{ search.results_count }} {{ 'search.results_for' | t | default: 'results for' }} &ldquo;{{ search.terms | escape }}&rdquo;</p>
+      {%- endif -%}
+    </header>
+
+    {%- if search.performed -%}
+      {%- paginate search.results by section.settings.results_per_page -%}
+        {%- if search.results.size > 0 -%}
+          <ul class="mg-search-results__grid" role="list" data-mg-animate>
+            {%- for item in search.results -%}
+              <li>
+                {%- case item.object_type -%}
+                  {%- when 'product' -%}{%- render 'product-card', product: item -%}
+                  {%- when 'article' -%}{%- render 'article-card', article: item -%}
+                  {%- else -%}
+                    <a class="mg-search-results__page" href="{{ item.url }}"><h3>{{ item.title | escape }}</h3>{%- if item.content -%}<p>{{ item.content | strip_html | truncatewords: 20 }}</p>{%- endif -%}</a>
+                {%- endcase -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+          {%- render 'pagination', paginate: paginate -%}
+        {%- else -%}
+          <p class="mg-search-results__empty">{{ 'search.no_results' | t }} &ldquo;{{ search.terms | escape }}&rdquo;</p>
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- endif -%}
+  </div>
+</section>
+{% stylesheet %}
+.mg-search-results__header { text-align: center; margin-bottom: var(--mg-space-9); }
+.mg-search-results__title { font-size: var(--mg-fs-hero); font-weight: 300; margin-bottom: var(--mg-space-5); }
+.mg-search-results__form { display: flex; gap: var(--mg-space-2); max-width: 560px; margin-inline: auto; }
+.mg-search-results__form input { flex: 1; padding: 0 var(--mg-space-4); height: 52px; border: var(--mg-border-hairline) solid var(--mg-border-input); }
+.mg-search-results__count { margin-top: var(--mg-space-4); color: var(--mg-text-secondary); font-size: var(--mg-fs-body-sm); }
+.mg-search-results__grid { display: grid; grid-template-columns: repeat(var(--mg-cols, 4), minmax(0, 1fr)); gap: var(--mg-space-7); list-style: none; margin: 0; padding: 0; }
+.mg-search-results__page { display: block; padding: var(--mg-space-5); border: var(--mg-border-hairline) solid var(--mg-border-card); }
+.mg-search-results__empty { text-align: center; color: var(--mg-text-secondary); padding-block: var(--mg-space-10); }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (max-width: 989px) { .mg-search-results__grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .mg-search-results__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+{% schema %}
+{
+  "name": "Search results",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "columns", "min": 2, "max": 5, "step": 1, "label": "Columns", "default": 4 },
+    { "type": "range", "id": "results_per_page", "min": 8, "max": 36, "step": 4, "label": "Results per page", "default": 20 }
+  ],
+  "enabled_on": { "templates": ["search"] }
+}
+{% endschema %}

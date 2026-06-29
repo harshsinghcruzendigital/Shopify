@@ -1,0 +1,57 @@
+{%- comment -%} Madrishi Global — Contact form (Part 9). Native {% form 'contact' %}. {%- endcomment -%}
+<section class="mg-contact mg-section" id="MainContact-{{ section.id }}" data-mg-animate-section style="--mg-contact-pad-top: {{ section.settings.padding_top }}px; --mg-contact-pad-bottom: {{ section.settings.padding_bottom }}px;">
+  <div class="mg-contact__inner mg-container mg-container--narrow">
+    <header class="mg-contact__header" data-mg-animate>
+      {%- if section.settings.eyebrow != blank -%}<p class="mg-eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      <h1 class="mg-contact__title">{{ section.settings.heading | default: page.title | escape }}</h1>
+      {%- if section.settings.text != blank -%}<div class="mg-contact__text rte">{{ section.settings.text }}</div>{%- endif -%}
+    </header>
+
+    {%- form 'contact', class: 'mg-contact__form' -%}
+      {%- if form.posted_successfully? -%}
+        <p class="mg-contact__success">{{ 'contact.success' | t | default: 'Thank you — we will be in touch shortly.' }}</p>
+      {%- elsif form.errors -%}
+        <p class="mg-contact__error" role="alert">{{ 'contact.error' | t | default: 'Please check the form and try again.' }}</p>
+      {%- endif -%}
+      <div class="mg-contact__row">
+        <label class="mg-field"><span>{{ 'contact.name' | t | default: 'Name' }}</span><input type="text" name="contact[name]" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}" required></label>
+        <label class="mg-field"><span>{{ 'contact.email' | t | default: 'Email' }}</span><input type="email" name="contact[email]" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" required></label>
+      </div>
+      <label class="mg-field"><span>{{ 'contact.phone' | t | default: 'Phone (optional)' }}</span><input type="tel" name="contact[phone]" value="{{ form.phone }}"></label>
+      <label class="mg-field"><span>{{ 'contact.message' | t | default: 'Message' }}</span><textarea name="contact[body]" rows="5" required>{{ form.body }}</textarea></label>
+      <button type="submit" class="mg-btn mg-btn--primary">{{ 'contact.send' | t | default: 'Send message' }}</button>
+    {%- endform -%}
+  </div>
+</section>
+{% stylesheet %}
+.mg-contact { padding-block: var(--mg-contact-pad-top, var(--mg-section-spacing)) var(--mg-contact-pad-bottom, var(--mg-section-spacing)); }
+.mg-contact__header { text-align: center; margin-bottom: var(--mg-space-8); }
+.mg-contact__title { font-size: var(--mg-fs-hero); font-weight: 300; }
+.mg-contact__text { color: var(--mg-text-secondary); margin-top: var(--mg-space-3); }
+.mg-contact__form { display: flex; flex-direction: column; gap: var(--mg-space-4); }
+.mg-contact__row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--mg-space-4); }
+.mg-field { display: flex; flex-direction: column; gap: var(--mg-space-2); }
+.mg-field > span { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; }
+.mg-field input, .mg-field textarea { padding: var(--mg-space-3) var(--mg-space-4); border: var(--mg-border-hairline) solid var(--mg-border-input); background: var(--mg-white); font: inherit; }
+.mg-field input:focus, .mg-field textarea:focus { outline: none; border-color: var(--mg-gold); }
+.mg-contact__success { color: var(--mg-success); }
+.mg-contact__error { color: var(--mg-error); }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (max-width: 600px) { .mg-contact__row { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+{% schema %}
+{
+  "name": "Contact form",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Concierge" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Get in touch" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Our client care team is here to assist you.</p>" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 96 }
+  ],
+  "presets": [ { "name": "Contact form" } ]
+}
+{% endschema %}

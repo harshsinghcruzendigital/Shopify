@@ -1,0 +1,38 @@
+{%- comment -%} Madrishi Global — Generic page (Part 9). Title + RTE content. {%- endcomment -%}
+<section class="mg-page mg-section" id="MainPage-{{ section.id }}" data-mg-animate-section style="--mg-page-pad-top: {{ section.settings.padding_top }}px; --mg-page-pad-bottom: {{ section.settings.padding_bottom }}px;">
+  <div class="mg-page__inner mg-container {% if section.settings.narrow %}mg-container--narrow{% endif %}">
+    {%- if section.settings.show_breadcrumb -%}{%- render 'breadcrumbs', class: 'mg-page__breadcrumb' -%}{%- endif -%}
+    <header class="mg-page__header {% if section.settings.center_heading %}mg-page__header--center{% endif %}" data-mg-animate>
+      {%- if section.settings.eyebrow != blank -%}<p class="mg-eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      <h1 class="mg-page__title">{{ page.title | escape }}</h1>
+    </header>
+    {%- if page.content != blank -%}<div class="mg-page__content rte" data-mg-animate>{{ page.content }}</div>{%- endif -%}
+  </div>
+</section>
+{% stylesheet %}
+.mg-page { padding-block: var(--mg-page-pad-top, var(--mg-section-spacing)) var(--mg-page-pad-bottom, var(--mg-section-spacing)); }
+.mg-page__breadcrumb { margin-bottom: var(--mg-space-5); }
+.mg-page__header { margin-bottom: var(--mg-space-8); }
+.mg-page__header--center { text-align: center; }
+.mg-page__title { font-size: var(--mg-fs-hero); font-weight: 300; line-height: var(--mg-lh-tight); }
+.mg-page__content { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); color: var(--mg-text-secondary); }
+.mg-page__content > * + * { margin-top: var(--mg-space-4); }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+{% schema %}
+{
+  "name": "Page",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "checkbox", "id": "center_heading", "label": "Center heading", "default": true },
+    { "type": "checkbox", "id": "narrow", "label": "Narrow content width", "default": true },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 96 }
+  ],
+  "enabled_on": { "templates": ["page"] }
+}
+{% endschema %}

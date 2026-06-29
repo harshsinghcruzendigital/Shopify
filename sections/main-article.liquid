@@ -1,0 +1,93 @@
+{%- comment -%} Madrishi Global — Article / Journal post (Part 9). {%- endcomment -%}
+<article class="mg-post mg-section" id="MainArticle-{{ section.id }}" data-mg-animate-section>
+  <div class="mg-post__inner mg-container mg-container--narrow">
+    {%- if section.settings.show_breadcrumb -%}{%- render 'breadcrumbs', class: 'mg-post__breadcrumb' -%}{%- endif -%}
+    <header class="mg-post__header" data-mg-animate>
+      <p class="mg-post__meta">
+        {%- if article.tags.size > 0 -%}<span class="mg-post__tag">{{ article.tags.first }}</span> · {% endif -%}
+        <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: '%B %d, %Y' }}</time>
+        {%- if section.settings.show_author -%} · {{ article.author }}{%- endif -%}
+      </p>
+      <h1 class="mg-post__title">{{ article.title | escape }}</h1>
+    </header>
+  </div>
+
+  {%- if article.image and section.settings.show_image -%}
+    <div class="mg-post__hero mg-container" data-mg-animate>
+      {%- render 'responsive-image', image: article.image, sizes: '(min-width:1280px) 1100px, 100vw', class: 'mg-post__hero-img', loading: 'eager', fetchpriority: 'high', aspect_ratio: '16/9' -%}
+    </div>
+  {%- endif -%}
+
+  <div class="mg-post__inner mg-container mg-container--narrow">
+    <div class="mg-post__content rte" data-mg-animate>{{ article.content }}</div>
+
+    {%- if section.settings.show_share -%}
+      <div class="mg-post__share" data-mg-animate>
+        <span class="mg-post__share-label">{{ 'blog.share' | t | default: 'Share' }}</span>{%- render 'social-icons' -%}
+      </div>
+    {%- endif -%}
+
+    {%- if blog.next_article or blog.previous_article -%}
+      <nav class="mg-post__nav" aria-label="{{ 'blog.more' | t | default: 'More articles' }}">
+        {%- if blog.previous_article -%}<a class="mg-btn mg-btn--text" href="{{ blog.previous_article.url }}">&larr; {{ blog.previous_article.title | escape }}</a>{%- endif -%}
+        {%- if blog.next_article -%}<a class="mg-btn mg-btn--text" href="{{ blog.next_article.url }}">{{ blog.next_article.title | escape }} &rarr;</a>{%- endif -%}
+      </nav>
+    {%- endif -%}
+
+    {%- if section.settings.show_comments and blog.comments_enabled? -%}
+      <div class="mg-post__comments">
+        {%- if article.comments_count > 0 -%}
+          <h2 class="mg-post__comments-title">{{ article.comments_count }} {{ 'blog.comments' | t | default: 'Comments' }}</h2>
+          {%- for comment in article.comments -%}
+            <div class="mg-post__comment"><p class="mg-post__comment-body">{{ comment.content }}</p><p class="mg-post__comment-author">{{ comment.author }}</p></div>
+          {%- endfor -%}
+        {%- endif -%}
+        {%- form 'new_comment', article, class: 'mg-post__comment-form' -%}
+          {%- if form.posted_successfully? -%}<p class="mg-contact__success">{{ 'blog.comment_success' | t | default: 'Comment submitted.' }}</p>{%- endif -%}
+          <div class="mg-contact__row">
+            <label class="mg-field"><span>{{ 'contact.name' | t }}</span><input type="text" name="comment[author]" value="{{ form.author }}" required></label>
+            <label class="mg-field"><span>{{ 'contact.email' | t }}</span><input type="email" name="comment[email]" value="{{ form.email }}" required></label>
+          </div>
+          <label class="mg-field"><span>{{ 'blog.comment' | t | default: 'Comment' }}</span><textarea name="comment[body]" rows="4" required>{{ form.body }}</textarea></label>
+          <button type="submit" class="mg-btn mg-btn--primary">{{ 'blog.post_comment' | t | default: 'Post comment' }}</button>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </div>
+</article>
+{% stylesheet %}
+.mg-post__breadcrumb { margin-bottom: var(--mg-space-5); }
+.mg-post__header { text-align: center; margin-bottom: var(--mg-space-8); }
+.mg-post__meta { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-text-muted); margin-bottom: var(--mg-space-3); }
+.mg-post__tag { color: var(--mg-gold); }
+.mg-post__title { font-size: var(--mg-fs-hero); font-weight: 300; line-height: var(--mg-lh-tight); }
+.mg-post__hero { margin-bottom: var(--mg-space-9); }
+.mg-post__hero-img { width: 100%; height: auto; }
+.mg-post__content { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); }
+.mg-post__content > * + * { margin-top: var(--mg-space-5); }
+.mg-post__content img { margin-block: var(--mg-space-6); }
+.mg-post__share { display: flex; align-items: center; gap: var(--mg-space-3); margin-top: var(--mg-space-9); padding-top: var(--mg-space-6); border-top: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-post__share-label { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; }
+.mg-post__nav { display: flex; justify-content: space-between; gap: var(--mg-space-5); margin-top: var(--mg-space-8); flex-wrap: wrap; }
+.mg-post__comments { margin-top: var(--mg-space-10); }
+.mg-post__comment { padding: var(--mg-space-4) 0; border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-post__comment-author { font-size: var(--mg-fs-caption); color: var(--mg-text-muted); margin-top: var(--mg-space-2); }
+.mg-post__comment-form { margin-top: var(--mg-space-6); display: flex; flex-direction: column; gap: var(--mg-space-4); }
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(16px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+{% schema %}
+{
+  "name": "Article",
+  "tag": "section",
+  "settings": [
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "checkbox", "id": "show_image", "label": "Show featured image", "default": true },
+    { "type": "checkbox", "id": "show_author", "label": "Show author", "default": true },
+    { "type": "checkbox", "id": "show_share", "label": "Show share", "default": true },
+    { "type": "checkbox", "id": "show_comments", "label": "Show comments", "default": true }
+  ],
+  "enabled_on": { "templates": ["article"] }
+}
+{% endschema %}
