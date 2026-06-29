@@ -55,10 +55,37 @@
     "country_label": "Country/region",
     "language_label": "Language"
   },
+  "footer": {
+    "payment_methods": "Payment methods"
+  },
+  "newsletter": {
+    "email": "Email",
+    "placeholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "success": "Thank you for subscribing."
+  },
   "wishlist": {
     "title": "Wishlist",
     "empty": "Your wishlist is empty.",
     "continue": "Continue shopping"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty.",
+    "continue": "Continue shopping",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "increase": "Increase quantity",
+    "decrease": "Decrease quantity",
+    "subtotal": "Subtotal",
+    "taxes_note": "Taxes and shipping calculated at checkout.",
+    "checkout": "Checkout",
+    "view": "View cart",
+    "add_note": "Add a gift note",
+    "note_placeholder": "Add a note to your order",
+    "free_shipping_progress": "You are",
+    "away": "away from complimentary shipping",
+    "free_shipping_reached": "You have unlocked complimentary shipping."
   },
   "search": {
     "placeholder": "Search for products, collections…",

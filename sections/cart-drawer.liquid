@@ -1,0 +1,160 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Cart Drawer
+  AJAX cart drawer on the reusable .mg-drawer base. The [data-mg-cart-
+  contents] region is re-rendered by cart.js via the Section Rendering
+  API on every change. Lives in the header section group (global).
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign threshold = section.settings.free_shipping_threshold | times: 100
+  assign remaining = threshold | minus: cart.total_price
+  assign progress = 0
+  if threshold > 0 and cart.total_price > 0
+    assign progress = cart.total_price | times: 100 | divided_by: threshold
+    if progress > 100
+      assign progress = 100
+    endif
+  endif
+-%}
+
+<mg-cart-drawer class="mg-drawer mg-cart" id="mg-cart" hidden data-section-id="{{ section.id }}">
+  <div class="mg-drawer__overlay" data-mg-drawer-close></div>
+  <div class="mg-drawer__panel" role="dialog" aria-modal="true" aria-label="{{ 'cart.title' | t | default: 'Cart' }}">
+    <div class="mg-drawer__head">
+      <h2 class="mg-drawer__title">{{ 'cart.title' | t | default: 'Cart' }} <span class="mg-cart__count" data-mg-cart-count>{{ cart.item_count }}</span></h2>
+      <button class="mg-drawer__close" type="button" data-mg-drawer-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close' -%}</button>
+    </div>
+
+    <div data-mg-cart-contents>
+      {%- if cart.item_count > 0 -%}
+        {%- if section.settings.free_shipping_threshold > 0 -%}
+          <div class="mg-cart__shipping">
+            {%- if remaining > 0 -%}
+              <p class="mg-cart__shipping-text">{{ 'cart.free_shipping_progress' | t | default: 'You are' }} <strong>{{ remaining | money }}</strong> {{ 'cart.away' | t | default: 'away from complimentary shipping' }}</p>
+            {%- else -%}
+              <p class="mg-cart__shipping-text">{{ 'cart.free_shipping_reached' | t | default: 'You have unlocked complimentary shipping.' }}</p>
+            {%- endif -%}
+            <div class="mg-cart__progress" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+              <span class="mg-cart__progress-bar" style="width: {{ progress }}%;"></span>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <ul class="mg-cart__items" role="list">
+          {%- for item in cart.items -%}
+            <li class="mg-cart__item" data-mg-line data-line="{{ forloop.index }}">
+              <a class="mg-cart__item-media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+                {%- if item.image -%}
+                  {%- render 'responsive-image', image: item.image, sizes: '96px', class: 'mg-cart__item-img', widths: '96,192,288', aspect_ratio: '3/4' -%}
+                {%- else -%}
+                  <span class="mg-image-placeholder" style="aspect-ratio:3/4;">{{ 'product-1' | placeholder_svg_tag }}</span>
+                {%- endif -%}
+              </a>
+              <div class="mg-cart__item-info">
+                <a class="mg-cart__item-title" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="mg-cart__item-variant">{{ item.variant.title | escape }}</p>
+                {%- endunless -%}
+                {%- if item.selling_plan_allocation -%}<p class="mg-cart__item-variant">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>{%- endif -%}
+
+                <div class="mg-cart__item-bottom">
+                  <div class="mg-cart__qty" data-mg-line data-line="{{ forloop.index }}">
+                    <button class="mg-cart__qty-btn" type="button" data-mg-qty-down aria-label="{{ 'cart.decrease' | t | default: 'Decrease quantity' }}">{%- render 'icon', name: 'minus', size: 14 -%}</button>
+                    <input class="mg-cart__qty-input" type="number" min="0" value="{{ item.quantity }}" data-mg-qty-input aria-label="{{ 'cart.quantity' | t | default: 'Quantity' }}">
+                    <button class="mg-cart__qty-btn" type="button" data-mg-qty-up aria-label="{{ 'cart.increase' | t | default: 'Increase quantity' }}">{%- render 'icon', name: 'plus', size: 14 -%}</button>
+                  </div>
+                  <span class="mg-cart__item-price">
+                    {%- if item.original_line_price > item.final_line_price -%}
+                      <s class="mg-cart__item-price-was">{{ item.original_line_price | money }}</s>
+                    {%- endif -%}
+                    {{ item.final_line_price | money }}
+                  </span>
+                </div>
+
+                <button class="mg-cart__item-remove" type="button" data-mg-cart-remove data-line="{{ forloop.index }}">{{ 'cart.remove' | t | default: 'Remove' }}</button>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <div class="mg-cart__foot mg-drawer__foot">
+          {%- if section.settings.show_note -%}
+            <details class="mg-cart__note">
+              <summary class="mg-cart__note-summary">{{ 'cart.add_note' | t | default: 'Add a gift note' }}</summary>
+              <textarea class="mg-cart__note-input" data-mg-cart-note rows="3" placeholder="{{ 'cart.note_placeholder' | t | default: 'Add a note to your order' }}">{{ cart.note }}</textarea>
+            </details>
+          {%- endif -%}
+
+          <div class="mg-cart__subtotal">
+            <span>{{ 'cart.subtotal' | t | default: 'Subtotal' }}</span>
+            <span class="mg-cart__subtotal-amount">{{ cart.total_price | money }}</span>
+          </div>
+          <p class="mg-cart__taxes">{{ 'cart.taxes_note' | t | default: 'Taxes and shipping calculated at checkout.' }}</p>
+
+          <a class="mg-btn mg-btn--primary mg-cart__checkout" href="/checkout">{{ 'cart.checkout' | t | default: 'Checkout' }}</a>
+          <a class="mg-btn mg-btn--text mg-cart__view" href="{{ routes.cart_url }}">{{ 'cart.view' | t | default: 'View cart' }}</a>
+        </div>
+
+      {%- else -%}
+        <div class="mg-drawer__empty">
+          {%- render 'icon', name: 'bag', size: 32 -%}
+          <p>{{ 'cart.empty' | t | default: 'Your cart is empty.' }}</p>
+          <a class="mg-btn mg-btn--outline" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue' | t | default: 'Continue shopping' }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</mg-cart-drawer>
+
+{% stylesheet %}
+.mg-cart .mg-drawer__panel { padding: 0; }
+.mg-cart__count { font-size: var(--mg-fs-body-sm); color: var(--mg-text-muted); }
+.mg-cart [data-mg-cart-contents] { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+.mg-cart__shipping { padding: var(--mg-space-4) var(--mg-space-5); background: var(--mg-gray-soft); }
+.mg-cart__shipping-text { font-size: var(--mg-fs-body-sm); margin-bottom: var(--mg-space-2); }
+.mg-cart__progress { height: 4px; background: var(--mg-border-divider); border-radius: var(--mg-radius-pill); overflow: hidden; }
+.mg-cart__progress-bar { display: block; height: 100%; background: var(--mg-gold); transition: width var(--mg-dur-slow) var(--mg-ease); }
+
+.mg-cart__items { flex: 1; overflow-y: auto; list-style: none; margin: 0; padding: var(--mg-space-5); display: flex; flex-direction: column; gap: var(--mg-space-5); }
+.mg-cart__item { display: grid; grid-template-columns: 80px 1fr; gap: var(--mg-space-4); }
+.mg-cart__item-media { display: block; }
+.mg-cart__item-img { width: 100%; object-fit: cover; }
+.mg-cart__item-info { display: flex; flex-direction: column; gap: var(--mg-space-1); min-width: 0; }
+.mg-cart__item-title { font-family: var(--mg-font-display); font-size: var(--mg-fs-product-title); color: var(--mg-text); }
+.mg-cart__item-title:hover { color: var(--mg-gold); }
+.mg-cart__item-variant { font-size: var(--mg-fs-caption); color: var(--mg-text-muted); }
+.mg-cart__item-bottom { display: flex; align-items: center; justify-content: space-between; gap: var(--mg-space-3); margin-top: var(--mg-space-2); }
+.mg-cart__qty { display: inline-flex; align-items: center; border: var(--mg-border-hairline) solid var(--mg-border-input); }
+.mg-cart__qty-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; color: var(--mg-navy); }
+.mg-cart__qty-input { width: 36px; height: 32px; text-align: center; border: 0; border-inline: var(--mg-border-hairline) solid var(--mg-border-input); -moz-appearance: textfield; }
+.mg-cart__qty-input::-webkit-outer-spin-button, .mg-cart__qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mg-cart__item-price { font-size: var(--mg-fs-body-sm); font-weight: 500; }
+.mg-cart__item-price-was { color: var(--mg-text-muted); margin-right: var(--mg-space-1); }
+.mg-cart__item-remove { align-self: flex-start; margin-top: var(--mg-space-1); font-size: var(--mg-fs-caption); color: var(--mg-text-muted); text-decoration: underline; text-underline-offset: 2px; }
+.mg-cart__item-remove:hover { color: var(--mg-error); }
+
+.mg-cart__foot { background: var(--mg-bg-card); }
+.mg-cart__note { margin-bottom: var(--mg-space-4); }
+.mg-cart__note-summary { font-size: var(--mg-fs-body-sm); cursor: pointer; color: var(--mg-navy); }
+.mg-cart__note-input { width: 100%; margin-top: var(--mg-space-2); padding: var(--mg-space-3); border: var(--mg-border-hairline) solid var(--mg-border-input); border-radius: var(--mg-radius-xs); resize: vertical; }
+.mg-cart__subtotal { display: flex; align-items: baseline; justify-content: space-between; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; }
+.mg-cart__subtotal-amount { font-size: var(--mg-fs-card-heading); font-family: var(--mg-font-display); letter-spacing: 0; }
+.mg-cart__taxes { font-size: var(--mg-fs-caption); color: var(--mg-text-muted); margin: var(--mg-space-2) 0 var(--mg-space-4); }
+.mg-cart__checkout { width: 100%; margin-bottom: var(--mg-space-2); }
+.mg-cart__view { width: 100%; }
+.mg-cart.is-busy [data-mg-cart-contents] { opacity: var(--mg-opacity-muted); pointer-events: none; }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": [
+    { "type": "paragraph", "content": "Global AJAX cart. Place once in the Header group." },
+    { "type": "number", "id": "free_shipping_threshold", "label": "Free shipping threshold", "info": "In your store currency. 0 to disable the progress bar.", "default": 150 },
+    { "type": "checkbox", "id": "show_note", "label": "Allow gift note", "default": true }
+  ]
+}
+{% endschema %}
