@@ -1,0 +1,27 @@
+{
+  "settings": {
+    "brand": {
+      "header": "Brand",
+      "logo": "Logo",
+      "logo_mobile": "Mobile logo",
+      "logo_width": "Logo width",
+      "favicon": "Favicon"
+    },
+    "colors": {
+      "header": "Colors",
+      "brand": "Brand",
+      "neutrals": "Neutrals",
+      "text": "Text",
+      "borders": "Borders",
+      "status": "Status"
+    },
+    "layout": {
+      "header": "Layout",
+      "container_width": "Maximum content width",
+      "animations_enabled": "Enable animations"
+    },
+    "social": {
+      "header": "Social media"
+    }
+  }
+}

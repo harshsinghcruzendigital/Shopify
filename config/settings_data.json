@@ -1,0 +1,12 @@
+{
+  "current": {
+    "container_width": "1440",
+    "animations_enabled": true
+  },
+  "presets": {
+    "Madrishi Global": {
+      "container_width": "1440",
+      "animations_enabled": true
+    }
+  }
+}

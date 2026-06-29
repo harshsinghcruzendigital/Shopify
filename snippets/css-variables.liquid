@@ -1,0 +1,51 @@
+{%- comment -%}
+  css-variables.liquid
+  Emits merchant-editable theme settings as :root custom properties,
+  overriding the defaults in variables.css. Loaded in <head> AFTER
+  variables.css so settings win the cascade. No hardcoded values.
+{%- endcomment -%}
+{%- liquid
+  assign container = settings.container_width | default: '1440'
+-%}
+{%- style -%}
+  :root {
+    --mg-navy: {{ settings.color_navy }};
+    --mg-navy-deep: {{ settings.color_navy_deep }};
+    --mg-gold: {{ settings.color_gold }};
+    --mg-gold-muted: {{ settings.color_gold_muted }};
+    --mg-bronze: {{ settings.color_bronze }};
+    --mg-border-hover: {{ settings.color_gold }};
+
+    --mg-white: {{ settings.color_white }};
+    --mg-cream: {{ settings.color_cream }};
+    --mg-ivory: {{ settings.color_ivory }};
+    --mg-beige: {{ settings.color_beige }};
+    --mg-gray-soft: {{ settings.color_gray_soft }};
+    --mg-gray-neutral: {{ settings.color_gray_neutral }};
+
+    --mg-text: {{ settings.color_text }};
+    --mg-text-secondary: {{ settings.color_text_secondary }};
+    --mg-text-muted: {{ settings.color_text_muted }};
+    --mg-text-on-dark: {{ settings.color_text_on_dark }};
+
+    --mg-bg-page: {{ settings.color_cream }};
+    --mg-bg-section: {{ settings.color_gray_soft }};
+    --mg-bg-card: {{ settings.color_white }};
+    --mg-bg-footer: {{ settings.color_navy }};
+
+    --mg-border-divider: {{ settings.color_border_divider }};
+    --mg-border-input: {{ settings.color_border_input }};
+    --mg-border-card: {{ settings.color_border_card }};
+
+    --mg-success: {{ settings.color_success }};
+    --mg-warning: {{ settings.color_warning }};
+    --mg-error: {{ settings.color_error }};
+    --mg-info: {{ settings.color_info }};
+
+    --mg-container-active: {{ container }}px;
+  }
+  {%- unless settings.animations_enabled -%}
+  :root { --mg-transition-base: none; --mg-transition-slow: none; }
+  [data-mg-animate] { opacity: 1 !important; transform: none !important; }
+  {%- endunless -%}
+{%- endstyle -%}

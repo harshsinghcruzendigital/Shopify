@@ -1,0 +1,120 @@
+/* ============================================================
+   Madrishi Global — base.css
+   Reset, base elements, base typography, container, a11y helpers,
+   responsive visibility utilities. Tokens from variables.css.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--mg-font-body);
+  font-size: var(--mg-fs-body);
+  line-height: var(--mg-lh-body);
+  color: var(--mg-text);
+  background-color: var(--mg-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 var(--mg-space-4);
+  font-family: var(--mg-font-display);
+  font-weight: 400;
+  line-height: var(--mg-lh-heading);
+  color: var(--mg-text);
+}
+
+p { margin: 0 0 var(--mg-space-4); }
+p:last-child { margin-bottom: 0; }
+
+a { color: inherit; text-decoration: none; transition: color var(--mg-dur-base) var(--mg-ease); }
+a:hover { color: var(--mg-gold); }
+
+img, svg, video { display: block; max-width: 100%; height: auto; }
+
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; }
+
+input, textarea, select { font: inherit; color: inherit; }
+
+/* Visible focus — luxury gold ring, keyboard users only */
+:focus-visible {
+  outline: var(--mg-border-thick) solid var(--mg-gold);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* --- Eyebrow / label helper --- */
+.mg-eyebrow {
+  font-family: var(--mg-font-eyebrow);
+  font-size: var(--mg-fs-label);
+  font-weight: 600;
+  letter-spacing: var(--mg-track-wider);
+  text-transform: uppercase;
+  color: var(--mg-gold);
+}
+
+/* --- Container --- */
+.mg-container {
+  width: 100%;
+  max-width: var(--mg-container-active);
+  margin-inline: auto;
+  padding-inline: var(--mg-container-pad);
+}
+.mg-container--narrow { max-width: var(--mg-container-narrow); }
+
+/* --- Section rhythm --- */
+.mg-section { padding-block: var(--mg-section-spacing); }
+
+/* --- Accessibility helpers --- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mg-skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--mg-space-4);
+  z-index: var(--mg-z-toast);
+  padding: var(--mg-space-3) var(--mg-space-5);
+  background: var(--mg-navy);
+  color: var(--mg-ivory);
+  font-family: var(--mg-font-eyebrow);
+  font-size: var(--mg-fs-label);
+  letter-spacing: var(--mg-track-wide);
+  text-transform: uppercase;
+  transition: top var(--mg-dur-base) var(--mg-ease);
+}
+.mg-skip-link:focus { top: var(--mg-space-4); color: var(--mg-ivory); }
+
+/* --- Responsive visibility utilities --- */
+@media (max-width: 767px) {
+  .mg-hide-mobile { display: none !important; }
+}
+@media (min-width: 768px) {
+  .mg-hide-desktop { display: none !important; }
+}
+
+/* No-JS guard: components reveal progressively */
+.no-js [data-mg-requires-js] { display: none !important; }

@@ -1,0 +1,32 @@
+# Madrishi Global — Theme Check configuration
+# Run: shopify theme check
+root: .
+
+extends: :default
+
+ignore:
+  - node_modules/
+  - .git/
+
+# Enforce OS 2.0 best practices
+LiquidTag:
+  enabled: true
+TemplateLength:
+  enabled: true
+  max_length: 700
+UnusedAssign:
+  enabled: true
+UnusedSnippet:
+  enabled: true
+DeprecatedFilter:
+  enabled: true
+RequiredLayoutThemeObject:
+  enabled: true
+ImgLazyLoading:
+  enabled: true
+ImgWidthAndHeight:
+  enabled: true
+AssetSizeCSS:
+  enabled: true
+AssetSizeJavaScript:
+  enabled: true

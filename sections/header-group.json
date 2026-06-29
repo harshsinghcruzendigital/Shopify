@@ -1,0 +1,33 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "ann-1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Complimentary shipping on all orders",
+            "icon": "truck"
+          }
+        },
+        "ann-2": {
+          "type": "announcement",
+          "settings": {
+            "text": "Discover the new Heritage Collection",
+            "icon": "star"
+          }
+        }
+      },
+      "block_order": ["ann-1", "ann-2"],
+      "settings": {
+        "autorotate": true,
+        "rotation_speed": 5,
+        "pause_on_hover": true,
+        "animate": true
+      }
+    }
+  },
+  "order": ["announcement-bar"]
+}

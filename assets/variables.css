@@ -1,0 +1,170 @@
+/* ============================================================
+   Madrishi Global — Design Tokens (variables.css)
+   Mirrors DESIGN-SYSTEM.md 1:1. Color & layout tokens here are
+   DEFAULT fallbacks; merchant-editable values are overridden at
+   runtime by snippets/css-variables.liquid (loaded after this).
+   ============================================================ */
+
+:root {
+  /* --- Color: Brand --- */
+  --mg-navy: #1B2A4A;
+  --mg-navy-deep: #11182B;
+  --mg-gold: #B6975C;
+  --mg-gold-muted: #C9B07D;
+  --mg-bronze: #9C7A4E;
+  --mg-charcoal: #2B2B2B;
+
+  /* --- Color: Neutrals --- */
+  --mg-white: #FFFFFF;
+  --mg-cream: #FBF8F2;
+  --mg-ivory: #F7F4EC;
+  --mg-beige: #EDE6D8;
+  --mg-gray-soft: #F2EFE7;
+  --mg-gray-neutral: #D9D7D2;
+
+  /* --- Color: Text --- */
+  --mg-text: #1C1C1C;
+  --mg-text-secondary: #5C5C5C;
+  --mg-text-muted: #8A8A8A;
+  --mg-text-disabled: #B5B5B5;
+  --mg-text-on-dark: #F7F4EC;
+
+  /* --- Color: Backgrounds --- */
+  --mg-bg-page: #FBF8F2;
+  --mg-bg-section: #F2EFE7;
+  --mg-bg-card: #FFFFFF;
+  --mg-bg-footer: #1B2A4A;
+  --mg-overlay: rgba(17, 24, 43, 0.45);
+  --mg-overlay-strong: rgba(17, 24, 43, 0.65);
+
+  /* --- Color: Borders --- */
+  --mg-border-divider: #E6E2D8;
+  --mg-border-input: #D6D1C4;
+  --mg-border-card: #ECE8DE;
+  --mg-border-hover: #B6975C;
+
+  /* --- Color: Status --- */
+  --mg-success: #4A6B4D;
+  --mg-warning: #B08940;
+  --mg-error: #9B4A3F;
+  --mg-info: #3E5C7E;
+
+  /* --- Typography: families --- */
+  --mg-font-display: "Cormorant Garamond", "Didot", "Times New Roman", serif;
+  --mg-font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mg-font-eyebrow: "Jost", "Montserrat", sans-serif;
+
+  /* --- Typography: fluid sizes (clamp: mobile -> desktop) --- */
+  --mg-fs-display: clamp(2.5rem, 1.6rem + 4.5vw, 4.5rem);   /* 40 -> 72 */
+  --mg-fs-hero: clamp(2rem, 1.4rem + 3vw, 3.5rem);          /* 32 -> 56 */
+  --mg-fs-section: clamp(1.625rem, 1.2rem + 2.1vw, 2.5rem); /* 26 -> 40 */
+  --mg-fs-card-heading: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem); /* 20 -> 24 */
+  --mg-fs-collection-title: clamp(1.25rem, 1rem + 1.25vw, 1.75rem); /* 20 -> 28 */
+  --mg-fs-product-title: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* 16 -> 18 */
+  --mg-fs-body-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* 16 -> 18 */
+  --mg-fs-body: 1rem;          /* 16 */
+  --mg-fs-body-sm: 0.875rem;   /* 14 */
+  --mg-fs-caption: 0.75rem;    /* 12 */
+  --mg-fs-button: 0.875rem;    /* 14 */
+  --mg-fs-nav: 0.875rem;       /* 14 */
+  --mg-fs-label: 0.75rem;      /* 12 */
+  --mg-fs-price: 1rem;         /* 16 */
+  --mg-fs-badge: 0.6875rem;    /* 11 */
+
+  /* --- Typography: line-heights --- */
+  --mg-lh-tight: 1.1;
+  --mg-lh-heading: 1.2;
+  --mg-lh-snug: 1.35;
+  --mg-lh-body: 1.7;
+
+  /* --- Typography: tracking --- */
+  --mg-track-tight: -0.25px;
+  --mg-track-normal: 0;
+  --mg-track-wide: 0.5px;
+  --mg-track-wider: 1px;
+  --mg-track-widest: 1.5px;
+
+  /* --- Spacing scale (1..14) --- */
+  --mg-space-1: 0.25rem;  /* 4 */
+  --mg-space-2: 0.5rem;   /* 8 */
+  --mg-space-3: 0.75rem;  /* 12 */
+  --mg-space-4: 1rem;     /* 16 */
+  --mg-space-5: 1.25rem;  /* 20 */
+  --mg-space-6: 1.5rem;   /* 24 */
+  --mg-space-7: 2rem;     /* 32 */
+  --mg-space-8: 2.5rem;   /* 40 */
+  --mg-space-9: 3rem;     /* 48 */
+  --mg-space-10: 4rem;    /* 64 */
+  --mg-space-11: 5rem;    /* 80 */
+  --mg-space-12: 6rem;    /* 96 */
+  --mg-space-13: 7.5rem;  /* 120 */
+  --mg-space-14: 10rem;   /* 160 */
+
+  /* Section vertical rhythm (responsive) */
+  --mg-section-spacing: var(--mg-space-13);
+
+  /* --- Layout / container --- */
+  --mg-container-wide: 1440px;
+  --mg-container: 1200px;
+  --mg-container-narrow: 880px;
+  --mg-container-active: var(--mg-container-wide); /* overridden by settings */
+  --mg-container-pad: var(--mg-space-9);
+
+  /* --- Breakpoints (for reference in JS via getComputedStyle) --- */
+  --mg-bp-sm: 480px;
+  --mg-bp-md: 768px;
+  --mg-bp-lg: 990px;
+  --mg-bp-xl: 1280px;
+  --mg-bp-2xl: 1600px;
+
+  /* --- Radius --- */
+  --mg-radius-none: 0;
+  --mg-radius-xs: 2px;
+  --mg-radius-sm: 4px;
+  --mg-radius-md: 8px;
+  --mg-radius-pill: 999px;
+
+  /* --- Shadow --- */
+  --mg-shadow-xs: 0 1px 2px rgba(17,24,43,0.04);
+  --mg-shadow-sm: 0 2px 8px rgba(17,24,43,0.06);
+  --mg-shadow-md: 0 8px 24px rgba(17,24,43,0.08);
+  --mg-shadow-lg: 0 16px 48px rgba(17,24,43,0.10);
+  --mg-shadow-card-hover: 0 12px 32px rgba(17,24,43,0.10);
+
+  /* --- Animation --- */
+  --mg-dur-fast: 200ms;
+  --mg-dur-base: 300ms;
+  --mg-dur-slow: 500ms;
+  --mg-dur-slower: 800ms;
+  --mg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --mg-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --mg-transition-base: all var(--mg-dur-base) var(--mg-ease);
+  --mg-transition-slow: all var(--mg-dur-slow) var(--mg-ease);
+
+  /* --- Z-index scale --- */
+  --mg-z-base: 1;
+  --mg-z-dropdown: 100;
+  --mg-z-sticky-header: 200;
+  --mg-z-overlay: 300;
+  --mg-z-drawer: 400;
+  --mg-z-modal: 500;
+  --mg-z-toast: 600;
+
+  /* --- Opacity --- */
+  --mg-opacity-muted: 0.6;
+  --mg-opacity-disabled: 0.4;
+
+  /* --- Border widths --- */
+  --mg-border-hairline: 1px;
+  --mg-border-thick: 2px;
+}
+
+@media (min-width: 768px) and (max-width: 989px) {
+  :root { --mg-section-spacing: var(--mg-space-11); --mg-container-pad: var(--mg-space-7); }
+}
+@media (max-width: 767px) {
+  :root { --mg-section-spacing: var(--mg-space-10); --mg-container-pad: var(--mg-space-5); }
+}
+@media (max-width: 479px) {
+  :root { --mg-container-pad: var(--mg-space-4); }
+}

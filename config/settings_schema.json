@@ -1,0 +1,105 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Madrishi Global",
+    "theme_version": "0.1.0",
+    "theme_author": "Madrishi Global",
+    "theme_documentation_url": "https://github.com/harshsinghcruzendigital/Shopify",
+    "theme_support_url": "https://github.com/harshsinghcruzendigital/Shopify/issues"
+  },
+  {
+    "name": "t:settings.brand.header",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "t:settings.brand.logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_mobile",
+        "label": "t:settings.brand.logo_mobile"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 80,
+        "max": 320,
+        "step": 10,
+        "unit": "px",
+        "label": "t:settings.brand.logo_width",
+        "default": 160
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "t:settings.brand.favicon"
+      }
+    ]
+  },
+  {
+    "name": "t:settings.colors.header",
+    "settings": [
+      { "type": "header", "content": "t:settings.colors.brand" },
+      { "type": "color", "id": "color_navy", "label": "Luxury Navy", "default": "#1B2A4A" },
+      { "type": "color", "id": "color_navy_deep", "label": "Navy Deep", "default": "#11182B" },
+      { "type": "color", "id": "color_gold", "label": "Luxury Gold", "default": "#B6975C" },
+      { "type": "color", "id": "color_gold_muted", "label": "Muted Gold", "default": "#C9B07D" },
+      { "type": "color", "id": "color_bronze", "label": "Warm Bronze", "default": "#9C7A4E" },
+      { "type": "header", "content": "t:settings.colors.neutrals" },
+      { "type": "color", "id": "color_white", "label": "White", "default": "#FFFFFF" },
+      { "type": "color", "id": "color_cream", "label": "Cream (page bg)", "default": "#FBF8F2" },
+      { "type": "color", "id": "color_ivory", "label": "Ivory", "default": "#F7F4EC" },
+      { "type": "color", "id": "color_beige", "label": "Warm Beige", "default": "#EDE6D8" },
+      { "type": "color", "id": "color_gray_soft", "label": "Soft Gray (section bg)", "default": "#F2EFE7" },
+      { "type": "color", "id": "color_gray_neutral", "label": "Neutral Gray", "default": "#D9D7D2" },
+      { "type": "header", "content": "t:settings.colors.text" },
+      { "type": "color", "id": "color_text", "label": "Primary Text", "default": "#1C1C1C" },
+      { "type": "color", "id": "color_text_secondary", "label": "Secondary Text", "default": "#5C5C5C" },
+      { "type": "color", "id": "color_text_muted", "label": "Muted Text", "default": "#8A8A8A" },
+      { "type": "color", "id": "color_text_on_dark", "label": "Text on Dark", "default": "#F7F4EC" },
+      { "type": "header", "content": "t:settings.colors.borders" },
+      { "type": "color", "id": "color_border_divider", "label": "Divider", "default": "#E6E2D8" },
+      { "type": "color", "id": "color_border_input", "label": "Input Border", "default": "#D6D1C4" },
+      { "type": "color", "id": "color_border_card", "label": "Card Border", "default": "#ECE8DE" },
+      { "type": "header", "content": "t:settings.colors.status" },
+      { "type": "color", "id": "color_success", "label": "Success", "default": "#4A6B4D" },
+      { "type": "color", "id": "color_warning", "label": "Warning", "default": "#B08940" },
+      { "type": "color", "id": "color_error", "label": "Error", "default": "#9B4A3F" },
+      { "type": "color", "id": "color_info", "label": "Information", "default": "#3E5C7E" }
+    ]
+  },
+  {
+    "name": "t:settings.layout.header",
+    "settings": [
+      {
+        "type": "select",
+        "id": "container_width",
+        "label": "t:settings.layout.container_width",
+        "options": [
+          { "value": "1200", "label": "Standard (1200px)" },
+          { "value": "1440", "label": "Wide (1440px)" },
+          { "value": "1600", "label": "Extra wide (1600px)" }
+        ],
+        "default": "1440"
+      },
+      {
+        "type": "checkbox",
+        "id": "animations_enabled",
+        "label": "t:settings.layout.animations_enabled",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "t:settings.social.header",
+    "settings": [
+      { "type": "text", "id": "social_instagram", "label": "Instagram", "info": "https://instagram.com/..." },
+      { "type": "text", "id": "social_facebook", "label": "Facebook" },
+      { "type": "text", "id": "social_pinterest", "label": "Pinterest" },
+      { "type": "text", "id": "social_tiktok", "label": "TikTok" },
+      { "type": "text", "id": "social_youtube", "label": "YouTube" },
+      { "type": "text", "id": "social_x", "label": "X (Twitter)" }
+    ]
+  }
+]
