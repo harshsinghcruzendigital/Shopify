@@ -28,7 +28,10 @@
         "show_localization": true,
         "show_payment_icons": true
       }
-    }
+    },
+    "newsletter-popup": { "type": "newsletter-popup", "settings": { "enable": false } },
+    "cookie-banner": { "type": "cookie-banner", "settings": { "enable": false } },
+    "scroll-utilities": { "type": "scroll-utilities", "settings": { "show_progress": true, "show_back_to_top": true } }
   },
-  "order": ["footer"]
+  "order": ["footer", "newsletter-popup", "cookie-banner", "scroll-utilities"]
 }

@@ -1,0 +1,18 @@
+{%- comment -%}
+  modal.liquid — reusable generic modal shell (uses utilities.js <mg-modal>).
+  Open from anywhere with: <button data-mg-modal-open="THE_ID">…</button>
+  Params:
+    id       (required) unique id used by the open trigger
+    title    (optional) heading
+    content  (optional) HTML/string body. For rich/complex bodies, render
+             <mg-modal id="..."> markup directly instead of this snippet.
+    class    (optional) extra class on the dialog
+{%- endcomment -%}
+<mg-modal class="mg-modal" id="{{ id }}" hidden>
+  <div class="mg-modal__overlay" data-mg-modal-close></div>
+  <div class="mg-modal__dialog {{ class }}" role="dialog" aria-modal="true" {% if title != blank %}aria-label="{{ title | escape }}"{% endif %}>
+    <button class="mg-modal__close" type="button" data-mg-modal-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close' -%}</button>
+    {%- if title != blank -%}<h2 class="mg-modal__title">{{ title | escape }}</h2>{%- endif -%}
+    {%- if content != blank -%}<div class="mg-modal__body rte">{{ content }}</div>{%- endif -%}
+  </div>
+</mg-modal>

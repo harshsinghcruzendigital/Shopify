@@ -1,0 +1,86 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Scroll Utilities (Components 11 & 12)
+  Reading-progress bar + back-to-top button, both scroll-driven from a
+  single rAF-throttled listener. Custom element: <mg-scroll-utils>
+  ============================================================
+{%- endcomment -%}
+<mg-scroll-utils
+  class="mg-scrollutils"
+  data-threshold="{{ section.settings.show_after }}"
+  {% if section.settings.show_progress %}data-progress="true"{% endif %}
+  {% if section.settings.show_back_to_top %}data-back-to-top="true"{% endif %}
+  style="--mg-progress-color: {{ section.settings.progress_color }}; --mg-progress-height: {{ section.settings.progress_height }}px;"
+>
+  {%- if section.settings.show_progress -%}
+    <div class="mg-scrollutils__progress" role="presentation"><span class="mg-scrollutils__progress-bar" data-mg-progress></span></div>
+  {%- endif -%}
+  {%- if section.settings.show_back_to_top -%}
+    <button class="mg-scrollutils__top mg-scrollutils__top--{{ section.settings.position }}" type="button" data-mg-back-to-top aria-label="{{ 'general.accessibility.back_to_top' | t | default: 'Back to top' }}" hidden>
+      {%- render 'icon', name: 'arrow-up', size: 20 -%}
+    </button>
+  {%- endif -%}
+</mg-scroll-utils>
+
+{% stylesheet %}
+.mg-scrollutils__progress { position: fixed; top: 0; left: 0; right: 0; height: var(--mg-progress-height, 3px); z-index: var(--mg-z-toast); background: transparent; pointer-events: none; }
+.mg-scrollutils__progress-bar { display: block; height: 100%; width: 0; background: var(--mg-progress-color, var(--mg-gold)); transform-origin: left; transition: width 80ms linear; }
+.mg-scrollutils__top { position: fixed; bottom: var(--mg-space-7); z-index: var(--mg-z-overlay); width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; background: var(--mg-navy); color: var(--mg-ivory); box-shadow: var(--mg-shadow-md); opacity: 0; transform: translateY(12px); transition: opacity var(--mg-dur-base) var(--mg-ease), transform var(--mg-dur-base) var(--mg-ease), background var(--mg-dur-base) var(--mg-ease); }
+.mg-scrollutils__top--right { right: var(--mg-space-7); }
+.mg-scrollutils__top--left { left: var(--mg-space-7); }
+.mg-scrollutils__top[hidden] { display: inline-flex; }
+.mg-scrollutils__top.is-visible { opacity: 1; transform: translateY(0); }
+.mg-scrollutils__top:hover { background: var(--mg-navy-deep); color: var(--mg-ivory); }
+@media (max-width: 767px) { .mg-scrollutils__top { width: 44px; height: 44px; bottom: var(--mg-space-5); } .mg-scrollutils__top--right { right: var(--mg-space-4); } .mg-scrollutils__top--left { left: var(--mg-space-4); } }
+@media (prefers-reduced-motion: reduce) { .mg-scrollutils__top { transition: opacity var(--mg-dur-fast) linear; } .mg-scrollutils__progress-bar { transition: none; } }
+{% endstyle %}
+
+{% javascript %}
+class MGScrollUtils extends HTMLElement {
+  connectedCallback() {
+    this.bar = this.querySelector('[data-mg-progress]');
+    this.topBtn = this.querySelector('[data-mg-back-to-top]');
+    this.threshold = parseInt(this.dataset.threshold, 10) || 600;
+    this.ticking = false;
+
+    if (this.topBtn) this.topBtn.addEventListener('click', () => this._toTop());
+    this._onScroll = () => {
+      if (this.ticking) return;
+      this.ticking = true;
+      requestAnimationFrame(() => { this._update(); this.ticking = false; });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._update();
+  }
+  disconnectedCallback() { window.removeEventListener('scroll', this._onScroll); }
+
+  _update() {
+    const y = window.scrollY;
+    if (this.bar) {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      this.bar.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+    }
+    if (this.topBtn) this.topBtn.classList.toggle('is-visible', y > this.threshold);
+  }
+  _toTop() {
+    window.scrollTo({ top: 0, behavior: (window.MG && MG.utils.prefersReducedMotion()) ? 'auto' : 'smooth' });
+  }
+}
+if (!customElements.get('mg-scroll-utils')) customElements.define('mg-scroll-utils', MGScrollUtils);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Scroll utilities",
+  "settings": [
+    { "type": "header", "content": "Scroll progress bar" },
+    { "type": "checkbox", "id": "show_progress", "label": "Show reading progress bar", "default": true },
+    { "type": "color", "id": "progress_color", "label": "Progress color", "default": "#B6975C" },
+    { "type": "range", "id": "progress_height", "min": 1, "max": 8, "step": 1, "unit": "px", "label": "Progress height", "default": 3 },
+    { "type": "header", "content": "Back to top" },
+    { "type": "checkbox", "id": "show_back_to_top", "label": "Show back-to-top button", "default": true },
+    { "type": "select", "id": "position", "label": "Position", "options": [ { "value": "right", "label": "Bottom right" }, { "value": "left", "label": "Bottom left" } ], "default": "right" },
+    { "type": "range", "id": "show_after", "min": 200, "max": 1600, "step": 100, "unit": "px", "label": "Show after scrolling", "default": 600 }
+  ]
+}
+{% endschema %}

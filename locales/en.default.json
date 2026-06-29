@@ -9,6 +9,8 @@
       "play": "Play announcements",
       "menu": "Menu",
       "primary_nav": "Primary",
+      "back_to_top": "Back to top",
+      "loading": "Loading",
       "search": "Search",
       "account": "Account",
       "wishlist": "Wishlist",
@@ -57,6 +59,9 @@
   },
   "footer": {
     "payment_methods": "Payment methods"
+  },
+  "cookie": {
+    "aria": "Cookie consent"
   },
   "newsletter": {
     "email": "Email",

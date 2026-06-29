@@ -1,0 +1,77 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Cookie Banner (Component 10)
+  Accept / Decline consent with privacy link. Stores choice in
+  localStorage and, when available, syncs Shopify's Customer Privacy
+  (consent) API. Custom element: <mg-cookie-banner>
+  ============================================================
+{%- endcomment -%}
+{%- if section.settings.enable -%}
+  <mg-cookie-banner class="mg-cookie mg-cookie--{{ section.settings.position }}" id="mg-cookie" hidden role="region" aria-label="{{ 'cookie.aria' | t | default: 'Cookie consent' }}">
+    <div class="mg-cookie__inner">
+      <div class="mg-cookie__text rte">
+        {{ section.settings.text }}
+        {%- if section.settings.privacy_link != blank -%}
+          <a class="mg-cookie__link" href="{{ section.settings.privacy_link }}">{{ section.settings.privacy_text | default: 'Privacy Policy' | escape }}</a>
+        {%- endif -%}
+      </div>
+      <div class="mg-cookie__actions">
+        <button class="mg-btn mg-btn--ghost mg-cookie__decline" type="button" data-mg-cookie="decline">{{ section.settings.decline_text | default: 'Decline' | escape }}</button>
+        <button class="mg-btn mg-btn--primary mg-cookie__accept" type="button" data-mg-cookie="accept">{{ section.settings.accept_text | default: 'Accept' | escape }}</button>
+      </div>
+    </div>
+  </mg-cookie-banner>
+{%- endif -%}
+
+{% stylesheet %}
+.mg-cookie { position: fixed; left: 0; right: 0; z-index: var(--mg-z-toast); padding: var(--mg-space-4); }
+.mg-cookie[hidden] { display: none; }
+.mg-cookie--bottom { bottom: 0; }
+.mg-cookie--bottom-left { bottom: 0; right: auto; max-width: 460px; }
+.mg-cookie__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--mg-space-5); max-width: var(--mg-container-wide); margin-inline: auto; padding: var(--mg-space-5); background: var(--mg-navy); color: var(--mg-ivory); box-shadow: var(--mg-shadow-lg); flex-wrap: wrap; transform: translateY(20px); opacity: 0; transition: transform var(--mg-dur-base) var(--mg-ease), opacity var(--mg-dur-base) var(--mg-ease); }
+.mg-cookie.is-open .mg-cookie__inner { transform: translateY(0); opacity: 1; }
+.mg-cookie__text { font-size: var(--mg-fs-body-sm); color: var(--mg-ivory); flex: 1 1 320px; }
+.mg-cookie__link { color: var(--mg-gold); text-decoration: underline; text-underline-offset: 2px; }
+.mg-cookie__actions { display: flex; gap: var(--mg-space-3); flex: 0 0 auto; }
+.mg-cookie__decline { color: var(--mg-ivory); }
+@media (prefers-reduced-motion: reduce) { .mg-cookie__inner { transition: none; } }
+{% endstyle %}
+
+{% javascript %}
+class MGCookieBanner extends HTMLElement {
+  connectedCallback() {
+    this.key = 'mg-cookie-consent';
+    if (this._stored() && !(window.Shopify && Shopify.designMode)) return;
+    requestAnimationFrame(() => { this.hidden = false; requestAnimationFrame(() => this.classList.add('is-open')); });
+    this.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-mg-cookie]');
+      if (btn) this._choose(btn.dataset.mgCookie);
+    });
+  }
+  _choose(choice) {
+    try { localStorage.setItem(this.key, choice); } catch (e) {}
+    if (window.Shopify && Shopify.customerPrivacy && typeof Shopify.customerPrivacy.setTrackingConsent === 'function') {
+      Shopify.customerPrivacy.setTrackingConsent(choice === 'accept', () => {});
+    }
+    this.classList.remove('is-open');
+    setTimeout(() => { this.hidden = true; }, 320);
+  }
+  _stored() { try { return Boolean(localStorage.getItem(this.key)); } catch (e) { return false; } }
+}
+if (!customElements.get('mg-cookie-banner')) customElements.define('mg-cookie-banner', MGCookieBanner);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Cookie banner",
+  "settings": [
+    { "type": "checkbox", "id": "enable", "label": "Enable cookie banner", "default": false },
+    { "type": "select", "id": "position", "label": "Position", "options": [ { "value": "bottom", "label": "Bottom (full width)" }, { "value": "bottom-left", "label": "Bottom left" } ], "default": "bottom" },
+    { "type": "richtext", "id": "text", "label": "Message", "default": "<p>We use cookies to enhance your experience.</p>" },
+    { "type": "url", "id": "privacy_link", "label": "Privacy policy link" },
+    { "type": "text", "id": "privacy_text", "label": "Privacy link text", "default": "Privacy Policy" },
+    { "type": "text", "id": "accept_text", "label": "Accept label", "default": "Accept" },
+    { "type": "text", "id": "decline_text", "label": "Decline label", "default": "Decline" }
+  ]
+}
+{% endschema %}
