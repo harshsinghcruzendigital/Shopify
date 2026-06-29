@@ -89,6 +89,7 @@
     "taxes_note": "Taxes and shipping calculated at checkout.",
     "checkout": "Checkout",
     "view": "View cart",
+    "update": "Update",
     "add_note": "Add a gift note",
     "note_placeholder": "Add a note to your order",
     "free_shipping_progress": "You are",

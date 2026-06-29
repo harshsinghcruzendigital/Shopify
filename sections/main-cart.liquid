@@ -1,0 +1,134 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Cart Page (Part 8)
+  Full cart page. Works natively (form posts to /cart) and is enhanced
+  by cart.js (<mg-cart-page>) for AJAX qty/remove/note. Free-shipping
+  progress, subtotal, gift note, checkout.
+  ============================================================
+{%- endcomment -%}
+{%- liquid
+  assign threshold = section.settings.free_shipping_threshold | times: 100
+  assign remaining = threshold | minus: cart.total_price
+  assign progress = 0
+  if threshold > 0 and cart.total_price > 0
+    assign progress = cart.total_price | times: 100 | divided_by: threshold
+    if progress > 100
+      assign progress = 100
+    endif
+  endif
+-%}
+
+<section class="mg-cartpage mg-section" id="MainCart-{{ section.id }}">
+  <mg-cart-page class="mg-cartpage__el mg-container" data-section-id="{{ section.id }}">
+    <div class="mg-cartpage__head">
+      <h1 class="mg-cartpage__title">{{ 'cart.title' | t | default: 'Cart' }} <span data-mg-cart-count>{{ cart.item_count }}</span></h1>
+    </div>
+
+    <div data-mg-cart-page-inner>
+      {%- if cart.item_count > 0 -%}
+        {%- if section.settings.free_shipping_threshold > 0 -%}
+          <div class="mg-cartpage__shipping">
+            {%- if remaining > 0 -%}
+              <p>{{ 'cart.free_shipping_progress' | t }} <strong>{{ remaining | money }}</strong> {{ 'cart.away' | t }}</p>
+            {%- else -%}
+              <p>{{ 'cart.free_shipping_reached' | t }}</p>
+            {%- endif -%}
+            <div class="mg-cart__progress" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"><span class="mg-cart__progress-bar" style="width: {{ progress }}%;"></span></div>
+          </div>
+        {%- endif -%}
+
+        <form action="{{ routes.cart_url }}" method="post" class="mg-cartpage__form">
+          <div class="mg-cartpage__list" role="list">
+            {%- for item in cart.items -%}
+              <div class="mg-cartpage__item" role="listitem" data-mg-line data-line="{{ forloop.index }}">
+                <a class="mg-cartpage__media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+                  {%- if item.image -%}{%- render 'responsive-image', image: item.image, sizes: '120px', class: 'mg-cartpage__img', widths: '120,240', aspect_ratio: '3/4' -%}{%- else -%}<span class="mg-image-placeholder" style="aspect-ratio:3/4;">{{ 'product-1' | placeholder_svg_tag }}</span>{%- endif -%}
+                </a>
+                <div class="mg-cartpage__details">
+                  <a class="mg-cartpage__name" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+                  {%- unless item.product.has_only_default_variant -%}<p class="mg-cartpage__variant">{{ item.variant.title | escape }}</p>{%- endunless -%}
+                  <button class="mg-cartpage__remove" type="button" data-mg-cart-remove data-line="{{ forloop.index }}">{{ 'cart.remove' | t }}</button>
+                </div>
+                <div class="mg-cartpage__qty">
+                  <button class="mg-cart__qty-btn" type="button" data-mg-qty-down aria-label="{{ 'cart.decrease' | t }}">{%- render 'icon', name: 'minus', size: 14 -%}</button>
+                  <input class="mg-cart__qty-input" type="number" min="0" name="updates[]" value="{{ item.quantity }}" data-mg-qty-input aria-label="{{ 'cart.quantity' | t }}">
+                  <button class="mg-cart__qty-btn" type="button" data-mg-qty-up aria-label="{{ 'cart.increase' | t }}">{%- render 'icon', name: 'plus', size: 14 -%}</button>
+                </div>
+                <div class="mg-cartpage__line-price">
+                  {%- if item.original_line_price > item.final_line_price -%}<s>{{ item.original_line_price | money }}</s> {% endif -%}{{ item.final_line_price | money }}
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+
+          <div class="mg-cartpage__footer">
+            {%- if section.settings.show_note -%}
+              <div class="mg-cartpage__note">
+                <label for="mg-cart-note">{{ 'cart.add_note' | t }}</label>
+                <textarea id="mg-cart-note" name="note" data-mg-cart-note rows="3" placeholder="{{ 'cart.note_placeholder' | t }}">{{ cart.note }}</textarea>
+              </div>
+            {%- endif -%}
+            <div class="mg-cartpage__summary">
+              <div class="mg-cartpage__subtotal"><span>{{ 'cart.subtotal' | t }}</span><span class="mg-cartpage__subtotal-amount">{{ cart.total_price | money }}</span></div>
+              <p class="mg-cartpage__taxes">{{ 'cart.taxes_note' | t }}</p>
+              <button type="submit" name="checkout" class="mg-btn mg-btn--primary mg-cartpage__checkout">{{ 'cart.checkout' | t }}</button>
+              <noscript><button type="submit" name="update" class="mg-btn mg-btn--outline">{{ 'cart.update' | t | default: 'Update' }}</button></noscript>
+            </div>
+          </div>
+        </form>
+
+      {%- else -%}
+        <div class="mg-cartpage__empty">
+          {%- render 'icon', name: 'bag', size: 40 -%}
+          <p class="mg-cartpage__empty-title">{{ 'cart.empty' | t }}</p>
+          <a class="mg-btn mg-btn--primary" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue' | t }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </mg-cart-page>
+</section>
+
+{% stylesheet %}
+.mg-cartpage__el { display: block; }
+.mg-cartpage__title { font-size: var(--mg-fs-section); font-weight: 300; margin-bottom: var(--mg-space-7); }
+.mg-cartpage__shipping { margin-bottom: var(--mg-space-6); }
+.mg-cartpage__shipping p { font-size: var(--mg-fs-body-sm); margin-bottom: var(--mg-space-2); }
+.mg-cart__progress { height: 4px; background: var(--mg-border-divider); border-radius: var(--mg-radius-pill); overflow: hidden; }
+.mg-cart__progress-bar { display: block; height: 100%; background: var(--mg-gold); transition: width var(--mg-dur-slow) var(--mg-ease); }
+.mg-cartpage__item { display: grid; grid-template-columns: 96px 1fr auto auto; gap: var(--mg-space-5); align-items: center; padding: var(--mg-space-5) 0; border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-cartpage__img { width: 96px; }
+.mg-cartpage__name { font-family: var(--mg-font-display); font-size: var(--mg-fs-product-title); }
+.mg-cartpage__name:hover { color: var(--mg-gold); }
+.mg-cartpage__variant { font-size: var(--mg-fs-caption); color: var(--mg-text-muted); }
+.mg-cartpage__remove { font-size: var(--mg-fs-caption); color: var(--mg-text-muted); text-decoration: underline; margin-top: var(--mg-space-2); }
+.mg-cartpage__remove:hover { color: var(--mg-error); }
+.mg-cart__qty-btn { width: 36px; height: 40px; display: inline-flex; align-items: center; justify-content: center; }
+.mg-cartpage__qty { display: inline-flex; align-items: center; border: var(--mg-border-hairline) solid var(--mg-border-input); }
+.mg-cart__qty-input { width: 44px; height: 40px; text-align: center; border: 0; border-inline: var(--mg-border-hairline) solid var(--mg-border-input); -moz-appearance: textfield; }
+.mg-cart__qty-input::-webkit-outer-spin-button, .mg-cart__qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mg-cartpage__line-price { font-weight: 500; white-space: nowrap; }
+.mg-cartpage__footer { display: grid; gap: var(--mg-space-7); margin-top: var(--mg-space-7); }
+@media (min-width: 768px) { .mg-cartpage__footer { grid-template-columns: 1fr 360px; } }
+.mg-cartpage__note label { display: block; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; margin-bottom: var(--mg-space-2); }
+.mg-cartpage__note textarea { width: 100%; padding: var(--mg-space-3); border: var(--mg-border-hairline) solid var(--mg-border-input); }
+.mg-cartpage__subtotal { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mg-font-eyebrow); letter-spacing: var(--mg-track-wide); text-transform: uppercase; font-size: var(--mg-fs-caption); }
+.mg-cartpage__subtotal-amount { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); }
+.mg-cartpage__taxes { font-size: var(--mg-fs-caption); color: var(--mg-text-muted); margin: var(--mg-space-2) 0 var(--mg-space-4); }
+.mg-cartpage__checkout { width: 100%; }
+.mg-cartpage__empty { text-align: center; padding-block: var(--mg-space-12); display: flex; flex-direction: column; align-items: center; gap: var(--mg-space-4); }
+.mg-cartpage__empty-title { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); }
+.mg-cartpage.is-busy [data-mg-cart-page-inner] { opacity: var(--mg-opacity-muted); pointer-events: none; }
+@media (max-width: 600px) { .mg-cartpage__item { grid-template-columns: 72px 1fr; grid-template-areas: "media details" "media qty" "price price"; } .mg-cartpage__img { width: 72px; } }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section",
+  "settings": [
+    { "type": "number", "id": "free_shipping_threshold", "label": "Free shipping threshold", "info": "Store currency; 0 to disable", "default": 150 },
+    { "type": "checkbox", "id": "show_note", "label": "Allow gift note", "default": true }
+  ],
+  "enabled_on": { "templates": ["cart"] }
+}
+{% endschema %}

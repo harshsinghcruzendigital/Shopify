@@ -141,4 +141,44 @@
     }
   }
   if (!customElements.get('mg-cart-drawer')) customElements.define('mg-cart-drawer', MGCartDrawer);
+
+  /* ---------- Full cart page ---------- */
+  class MGCartPage extends HTMLElement {
+    connectedCallback() {
+      this.sectionId = this.dataset.sectionId;
+      this.addEventListener('click', (e) => this._onClick(e));
+      this.addEventListener('change', (e) => this._onChange(e));
+    }
+    _onClick(e) {
+      const remove = e.target.closest('[data-mg-cart-remove]');
+      if (remove) { e.preventDefault(); return this._change(remove.dataset.line, 0); }
+      const dec = e.target.closest('[data-mg-qty-down]');
+      const inc = e.target.closest('[data-mg-qty-up]');
+      if (dec || inc) {
+        const wrap = (dec || inc).closest('[data-mg-line]');
+        const qty = parseInt(wrap.querySelector('[data-mg-qty-input]').value, 10) || 1;
+        return this._change(wrap.dataset.line, dec ? qty - 1 : qty + 1);
+      }
+    }
+    _onChange(e) {
+      const input = e.target.closest('[data-mg-qty-input]');
+      if (input) return this._change(input.closest('[data-mg-line]').dataset.line, Math.max(0, parseInt(input.value, 10) || 0));
+      const note = e.target.closest('[data-mg-cart-note]');
+      if (note) Cart.updateNote(note.value);
+    }
+    async _change(line, quantity) {
+      this.classList.add('is-busy');
+      try {
+        await Cart.change(parseInt(line, 10), quantity);
+        const res = await fetch(`${root}cart?section_id=${this.sectionId}`);
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+        const fresh = doc.querySelector('[data-mg-cart-page-inner]');
+        const host = this.querySelector('[data-mg-cart-page-inner]');
+        if (fresh && host) host.innerHTML = fresh.innerHTML;
+        updateCounts(this.querySelector('[data-mg-cart-count]') ? parseInt(this.querySelector('[data-mg-cart-count]').textContent, 10) || 0 : 0);
+        if (MG.events) MG.events.emit('cart:updated');
+      } finally { this.classList.remove('is-busy'); }
+    }
+  }
+  if (!customElements.get('mg-cart-page')) customElements.define('mg-cart-page', MGCartPage);
 })();

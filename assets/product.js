@@ -102,4 +102,27 @@
     }
   }
   if (!customElements.get('mg-product-gallery')) customElements.define('mg-product-gallery', MGProductGallery);
+
+  class MGRecommendations extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.performed === 'true') return; // already rendered server-side
+      const url = this.dataset.url;
+      if (!url) return;
+      fetch(url)
+        .then((r) => r.text())
+        .then((text) => {
+          const doc = new DOMParser().parseFromString(text, 'text/html');
+          const fresh = doc.querySelector('[data-mg-recommendations-inner]');
+          const host = this.querySelector('[data-mg-recommendations-inner]');
+          if (fresh && host && fresh.children.length) {
+            host.innerHTML = fresh.innerHTML;
+            if (window.MG && MG.events) MG.events.emit('products:appended', { grid: host });
+          } else {
+            this.hidden = true;
+          }
+        })
+        .catch(() => { this.hidden = true; });
+    }
+  }
+  if (!customElements.get('mg-recommendations')) customElements.define('mg-recommendations', MGRecommendations);
 })();

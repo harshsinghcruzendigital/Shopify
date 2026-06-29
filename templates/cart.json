@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main-cart": {
+      "type": "main-cart",
+      "settings": { "free_shipping_threshold": 150, "show_note": true }
+    }
+  },
+  "order": ["main-cart"]
+}
