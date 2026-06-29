@@ -19,7 +19,84 @@
         }
       },
       "block_order": ["slide-1"]
+    },
+    "brand-philosophy": {
+      "type": "brand-philosophy",
+      "settings": {
+        "eyebrow": "Our Philosophy",
+        "heading": "Luxury is not loud. It is the quiet confidence of craftsmanship."
+      },
+      "blocks": {
+        "mission": { "type": "pillar", "settings": { "label": "Mission" } },
+        "vision": { "type": "pillar", "settings": { "label": "Vision", "heading": "A global house of modern heritage" } }
+      },
+      "block_order": ["mission", "vision"]
+    },
+    "featured-collections": {
+      "type": "related-collections",
+      "settings": {
+        "eyebrow": "Collections",
+        "heading": "Explore the House",
+        "layout": "grid",
+        "columns": 3,
+        "card_style": "overlay",
+        "image_ratio": "3/4"
+      },
+      "blocks": {
+        "fc1": { "type": "collection", "settings": { "cta_text": "Shop now" } },
+        "fc2": { "type": "collection", "settings": { "cta_text": "Shop now" } },
+        "fc3": { "type": "collection", "settings": { "cta_text": "Shop now" } }
+      },
+      "block_order": ["fc1", "fc2", "fc3"]
+    },
+    "editorial-banner": {
+      "type": "editorial-banner",
+      "settings": {
+        "full_width": true,
+        "height": "large",
+        "content_x": "left",
+        "content_y": "bottom",
+        "eyebrow": "New Season",
+        "heading": "The Heritage Collection",
+        "overlay_opacity": 35,
+        "button_1_text": "Discover"
+      }
+    },
+    "product-showcase": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "Curated",
+        "heading": "Signature Pieces",
+        "layout": "carousel",
+        "columns": 4,
+        "product_limit": 8
+      }
+    },
+    "craftsmanship": {
+      "type": "craftsmanship",
+      "settings": {
+        "media_position": "left",
+        "eyebrow": "Craftsmanship",
+        "heading": "The making of a masterpiece"
+      },
+      "blocks": {
+        "s1": { "type": "step", "settings": { "heading": "Sourcing" } },
+        "s2": { "type": "step", "settings": { "heading": "Design" } },
+        "s3": { "type": "step", "settings": { "heading": "Handcraft" } }
+      },
+      "block_order": ["s1", "s2", "s3"]
+    },
+    "global-map": {
+      "type": "global-map",
+      "settings": { "eyebrow": "Worldwide", "heading": "A global house" },
+      "blocks": {
+        "p1": { "type": "pin", "settings": { "label": "Paris", "x": 49, "y": 37 } },
+        "p2": { "type": "pin", "settings": { "label": "New York", "x": 27, "y": 42 } },
+        "p3": { "type": "pin", "settings": { "label": "Dubai", "x": 61, "y": 49 } },
+        "p4": { "type": "pin", "settings": { "label": "Tokyo", "x": 84, "y": 44 } }
+      },
+      "block_order": ["p1", "p2", "p3", "p4"]
     }
   },
-  "order": ["hero"]
+  "order": ["hero", "brand-philosophy", "featured-collections", "editorial-banner", "product-showcase", "craftsmanship", "global-map"]
 }

@@ -1,0 +1,140 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Homepage Section 06: Craftsmanship
+  Storytelling media (image or video) paired with a numbered process
+  timeline (step blocks). Editorial split layout. No section JS —
+  shared scroll-reveal observer.
+  ============================================================
+{%- endcomment -%}
+
+<section
+  class="mg-craft mg-craft--media-{{ section.settings.media_position }} {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-craft-bg: {{ section.settings.background }};
+    --mg-craft-text: {{ section.settings.text_color }};
+    --mg-craft-pad-top: {{ section.settings.padding_top }}px;
+    --mg-craft-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  data-mg-animate-section
+>
+  <div class="mg-craft__inner mg-container">
+    <div class="mg-craft__grid">
+      <div class="mg-craft__media" data-mg-animate>
+        {%- if section.settings.video != blank -%}
+          {{ section.settings.video | video_tag: image_size: '1100x', loop: true, autoplay: false, muted: true, controls: true, class: 'mg-craft__video' }}
+        {%- elsif section.settings.image != blank -%}
+          {%- render 'responsive-image', image: section.settings.image, mobile: section.settings.image_mobile, sizes: '(min-width:990px) 50vw, 100vw', class: 'mg-craft__img', aspect_ratio: section.settings.image_ratio -%}
+        {%- else -%}
+          <div class="mg-image-placeholder" style="aspect-ratio: {{ section.settings.image_ratio }};">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+        {%- endif -%}
+      </div>
+
+      <div class="mg-craft__content">
+        {%- if section.settings.eyebrow != blank -%}<p class="mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="mg-craft__heading" data-mg-animate>{{ section.settings.heading | escape }}</h2>{%- endif -%}
+        {%- if section.settings.text != blank -%}<div class="mg-craft__text rte" data-mg-animate>{{ section.settings.text }}</div>{%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <ol class="mg-craft__timeline">
+            {%- for block in section.blocks -%}
+              <li class="mg-craft__step" {{ block.shopify_attributes }} data-mg-animate>
+                <span class="mg-craft__step-num" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+                <div class="mg-craft__step-body">
+                  {%- if block.settings.heading != blank -%}<h3 class="mg-craft__step-heading">{{ block.settings.heading | escape }}</h3>{%- endif -%}
+                  {%- if block.settings.text != blank -%}<div class="mg-craft__step-text rte">{{ block.settings.text }}</div>{%- endif -%}
+                </div>
+              </li>
+            {%- endfor -%}
+          </ol>
+        {%- endif -%}
+
+        {%- if section.settings.button_text != blank -%}
+          <a class="mg-btn mg-btn--outline mg-craft__cta" href="{{ section.settings.button_link | default: '#' }}" data-mg-animate>{{ section.settings.button_text | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-craft { background: var(--mg-craft-bg, var(--mg-bg-section)); color: var(--mg-craft-text, var(--mg-text)); padding-block: var(--mg-craft-pad-top, var(--mg-section-spacing)) var(--mg-craft-pad-bottom, var(--mg-section-spacing)); }
+.mg-craft__grid { display: grid; gap: var(--mg-space-10); align-items: center; }
+@media (min-width: 990px) {
+  .mg-craft__grid { grid-template-columns: 1fr 1fr; gap: var(--mg-space-12); }
+  .mg-craft--media-right .mg-craft__media { order: 2; }
+}
+.mg-craft__media { overflow: hidden; }
+.mg-craft__img, .mg-craft__video { width: 100%; height: auto; display: block; }
+.mg-craft__heading { font-size: var(--mg-fs-section); font-weight: 300; line-height: var(--mg-lh-heading); color: inherit; margin: var(--mg-space-3) 0 var(--mg-space-5); }
+.mg-craft__text { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); color: var(--mg-text-secondary); margin-bottom: var(--mg-space-7); }
+
+.mg-craft__timeline { display: flex; flex-direction: column; gap: var(--mg-space-6); counter-reset: step; }
+.mg-craft__step { display: grid; grid-template-columns: auto 1fr; gap: var(--mg-space-5); align-items: start; position: relative; }
+.mg-craft__step:not(:last-child)::before { content: ""; position: absolute; left: 14px; top: 36px; bottom: calc(-1 * var(--mg-space-6)); width: 1px; background: var(--mg-border-divider); }
+.mg-craft__step-num { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); color: var(--mg-gold); line-height: 1; min-width: 28px; }
+.mg-craft__step-heading { font-family: var(--mg-font-display); font-size: var(--mg-fs-product-title); font-weight: 500; margin-bottom: var(--mg-space-1); color: inherit; }
+.mg-craft__step-text { color: var(--mg-text-secondary); font-size: var(--mg-fs-body-sm); line-height: var(--mg-lh-body); }
+.mg-craft__cta { margin-top: var(--mg-space-8); }
+
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+[data-mg-animate-section].is-revealed .mg-craft__step:nth-child(2) { transition-delay: 80ms; }
+[data-mg-animate-section].is-revealed .mg-craft__step:nth-child(3) { transition-delay: 160ms; }
+[data-mg-animate-section].is-revealed .mg-craft__step:nth-child(4) { transition-delay: 240ms; }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Craftsmanship",
+  "tag": "section",
+  "class": "mg-craft-section",
+  "settings": [
+    { "type": "header", "content": "Media" },
+    { "type": "select", "id": "media_position", "label": "Media position", "options": [ { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image" },
+    { "type": "video", "id": "video", "label": "Video", "info": "Overrides image" },
+    { "type": "select", "id": "image_ratio", "label": "Image ratio", "options": [ { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Portrait (3:4)" }, { "value": "1/1", "label": "Square" }, { "value": "3/2", "label": "Landscape" } ], "default": "4/5" },
+
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Craftsmanship" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The making of a masterpiece" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Every creation passes through the hands of master artisans, refined over generations.</p>" },
+    { "type": "text", "id": "button_text", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#F2EFE7" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Process step",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Sourcing" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Only the finest materials, ethically sourced from trusted partners.</p>" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Craftsmanship",
+      "blocks": [
+        { "type": "step", "settings": { "heading": "Sourcing" } },
+        { "type": "step", "settings": { "heading": "Design" } },
+        { "type": "step", "settings": { "heading": "Handcraft" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

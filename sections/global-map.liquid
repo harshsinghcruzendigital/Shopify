@@ -1,0 +1,181 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Homepage Section 07: Global Marketplace
+  Interactive world map: a map image with coordinate-positioned pins
+  (blocks). Each pin reveals a tooltip (label + note + link) on
+  hover/focus/tap. Optional stat row. Custom element: <mg-map>
+  ============================================================
+{%- endcomment -%}
+
+<section
+  class="mg-map {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-map-bg: {{ section.settings.background }};
+    --mg-map-text: {{ section.settings.text_color }};
+    --mg-map-pin: {{ section.settings.pin_color }};
+    --mg-map-pad-top: {{ section.settings.padding_top }}px;
+    --mg-map-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  data-mg-animate-section
+>
+  <div class="mg-map__inner mg-container">
+    <div class="mg-map__header mg-section-header mg-section-header--center">
+      {%- if section.settings.eyebrow != blank -%}<p class="mg-section-header__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      {%- if section.settings.heading != blank -%}<h2 class="mg-section-header__title" data-mg-animate>{{ section.settings.heading | escape }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank -%}<div class="mg-section-header__text rte" data-mg-animate>{{ section.settings.text }}</div>{%- endif -%}
+    </div>
+
+    <mg-map class="mg-map__canvas" data-mg-animate>
+      <div class="mg-map__image">
+        {%- if section.settings.map_image != blank -%}
+          {%- render 'responsive-image', image: section.settings.map_image, sizes: '(min-width:1280px) 1200px, 100vw', class: 'mg-map__img', aspect_ratio: '2/1' -%}
+        {%- else -%}
+          <div class="mg-image-placeholder" style="aspect-ratio: 2/1;">{{ 'image' | placeholder_svg_tag: 'mg-image-placeholder__svg' }}</div>
+        {%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        <div class="mg-map__pin-wrap" style="left: {{ block.settings.x }}%; top: {{ block.settings.y }}%;" {{ block.shopify_attributes }}>
+          <button class="mg-map__pin" type="button" aria-expanded="false" data-mg-pin aria-label="{{ block.settings.label | escape }}">
+            <span class="mg-map__pin-dot" aria-hidden="true"></span>
+          </button>
+          <div class="mg-map__tooltip" role="tooltip">
+            {%- if block.settings.label != blank -%}<p class="mg-map__tooltip-label">{{ block.settings.label | escape }}</p>{%- endif -%}
+            {%- if block.settings.text != blank -%}<p class="mg-map__tooltip-text">{{ block.settings.text | escape }}</p>{%- endif -%}
+            {%- if block.settings.link != blank and block.settings.link_text != blank -%}
+              <a class="mg-map__tooltip-link" href="{{ block.settings.link }}">{{ block.settings.link_text | escape }}</a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </mg-map>
+
+    {%- if section.settings.stats != blank -%}
+      <ul class="mg-map__stats" data-mg-animate>
+        {%- assign stats = section.settings.stats | split: ',' -%}
+        {%- for stat in stats -%}
+          {%- assign parts = stat | split: '|' -%}
+          <li class="mg-map__stat">
+            <span class="mg-map__stat-value">{{ parts[0] | strip }}</span>
+            {%- if parts[1] -%}<span class="mg-map__stat-label">{{ parts[1] | strip }}</span>{%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-map { background: var(--mg-map-bg, var(--mg-navy)); color: var(--mg-map-text, var(--mg-ivory)); padding-block: var(--mg-map-pad-top, var(--mg-section-spacing)) var(--mg-map-pad-bottom, var(--mg-section-spacing)); }
+.mg-map .mg-section-header__title { color: inherit; }
+.mg-map .mg-section-header__text { color: inherit; opacity: 0.8; }
+
+.mg-map__canvas { position: relative; display: block; margin-top: var(--mg-space-9); }
+.mg-map__img { width: 100%; height: auto; display: block; opacity: 0.9; }
+
+.mg-map__pin-wrap { position: absolute; transform: translate(-50%, -50%); z-index: 1; }
+.mg-map__pin-wrap:hover, .mg-map__pin-wrap:focus-within, .mg-map__pin-wrap.is-active { z-index: 3; }
+.mg-map__pin { position: relative; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; }
+.mg-map__pin-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--mg-map-pin, var(--mg-gold)); box-shadow: 0 0 0 4px rgba(182,151,92,0.25); }
+.mg-map__pin-dot::after { content: ""; position: absolute; inset: 0; margin: auto; width: 12px; height: 12px; border-radius: 50%; background: var(--mg-map-pin, var(--mg-gold)); animation: mg-map-pulse 2.4s var(--mg-ease) infinite; }
+@keyframes mg-map-pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(3.2); opacity: 0; } }
+
+.mg-map__tooltip { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%) translateY(6px); width: max-content; max-width: 240px; padding: var(--mg-space-3) var(--mg-space-4); background: var(--mg-white); color: var(--mg-text); box-shadow: var(--mg-shadow-md); text-align: left; opacity: 0; visibility: hidden; transition: opacity var(--mg-dur-base) var(--mg-ease), transform var(--mg-dur-base) var(--mg-ease), visibility var(--mg-dur-base); }
+.mg-map__pin-wrap:hover .mg-map__tooltip, .mg-map__pin-wrap:focus-within .mg-map__tooltip, .mg-map__pin-wrap.is-active .mg-map__tooltip { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+.mg-map__tooltip-label { font-family: var(--mg-font-display); font-size: var(--mg-fs-product-title); margin-bottom: var(--mg-space-1); }
+.mg-map__tooltip-text { font-size: var(--mg-fs-caption); color: var(--mg-text-secondary); }
+.mg-map__tooltip-link { display: inline-block; margin-top: var(--mg-space-2); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-navy); border-bottom: 1px solid var(--mg-gold); }
+
+.mg-map__stats { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--mg-space-10); margin-top: var(--mg-space-10); }
+.mg-map__stat { text-align: center; }
+.mg-map__stat-value { display: block; font-family: var(--mg-font-display); font-size: var(--mg-fs-section); line-height: 1; }
+.mg-map__stat-label { display: block; margin-top: var(--mg-space-2); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; opacity: 0.7; }
+
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+
+@media (max-width: 767px) {
+  .mg-map__stats { gap: var(--mg-space-7); }
+  .mg-map__tooltip { max-width: 180px; }
+}
+@media (prefers-reduced-motion: reduce) { .mg-map__pin-dot::after { animation: none; } [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% javascript %}
+class MGMap extends HTMLElement {
+  connectedCallback() {
+    this.pins = Array.from(this.querySelectorAll('[data-mg-pin]'));
+    this.addEventListener('click', (e) => {
+      const pin = e.target.closest('[data-mg-pin]');
+      if (!pin) return;
+      const wrap = pin.closest('.mg-map__pin-wrap');
+      const open = wrap.classList.contains('is-active');
+      this._closeAll();
+      if (!open) { wrap.classList.add('is-active'); pin.setAttribute('aria-expanded', 'true'); }
+    });
+    document.addEventListener('click', (e) => { if (!this.contains(e.target)) this._closeAll(); });
+    this.addEventListener('keydown', (e) => { if (e.key === 'Escape') this._closeAll(); });
+  }
+  _closeAll() {
+    this.querySelectorAll('.mg-map__pin-wrap.is-active').forEach((w) => {
+      w.classList.remove('is-active');
+      w.querySelector('[data-mg-pin]')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+}
+if (!customElements.get('mg-map')) customElements.define('mg-map', MGMap);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Global marketplace",
+  "tag": "section",
+  "class": "mg-map-section",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Worldwide" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "A global house" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>From our ateliers to your door, in over 40 countries.</p>" },
+    { "type": "image_picker", "id": "map_image", "label": "Map image", "info": "Upload a world map (2:1 ratio recommended)" },
+    { "type": "text", "id": "stats", "label": "Stats", "info": "Comma-separated, each as value|label. e.g. 40+|Countries, 120|Partners", "default": "40+|Countries, 120|Boutiques, 1M+|Clients" },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#1B2A4A" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#F7F4EC" },
+    { "type": "color", "id": "pin_color", "label": "Pin color", "default": "#B6975C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "blocks": [
+    {
+      "type": "pin",
+      "name": "Location pin",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Paris" },
+        { "type": "text", "id": "text", "label": "Note", "default": "Flagship Atelier" },
+        { "type": "range", "id": "x", "min": 0, "max": 100, "step": 1, "unit": "%", "label": "Horizontal position", "default": 50 },
+        { "type": "range", "id": "y", "min": 0, "max": 100, "step": 1, "unit": "%", "label": "Vertical position", "default": 40 },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "link_text", "label": "Link text", "default": "Visit" }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Global marketplace",
+      "blocks": [
+        { "type": "pin", "settings": { "label": "Paris", "x": 49, "y": 37 } },
+        { "type": "pin", "settings": { "label": "New York", "x": 27, "y": 42 } },
+        { "type": "pin", "settings": { "label": "Dubai", "x": 61, "y": 49 } },
+        { "type": "pin", "settings": { "label": "Tokyo", "x": 84, "y": 44 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,141 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Homepage Section 02: Brand Philosophy
+  Large editorial statement + optional story image + Mission/Vision
+  pillars (blocks) + optional signature. Story-first, content-led.
+  No section JS — uses shared scroll-reveal observer.
+  ============================================================
+{%- endcomment -%}
+
+<section
+  class="mg-philosophy {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-phil-bg: {{ section.settings.background }};
+    --mg-phil-text: {{ section.settings.text_color }};
+    --mg-phil-pad-top: {{ section.settings.padding_top }}px;
+    --mg-phil-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  data-mg-animate-section
+>
+  <div class="mg-philosophy__inner mg-container">
+    <div class="mg-philosophy__intro mg-container--narrow">
+      {%- if section.settings.eyebrow != blank -%}<p class="mg-eyebrow mg-philosophy__eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      {%- if section.settings.heading != blank -%}<h2 class="mg-philosophy__heading" data-mg-animate>{{ section.settings.heading | escape }}</h2>{%- endif -%}
+      {%- if section.settings.lead != blank -%}<div class="mg-philosophy__lead rte" data-mg-animate>{{ section.settings.lead }}</div>{%- endif -%}
+    </div>
+
+    {%- if section.settings.image != blank -%}
+      <div class="mg-philosophy__media" data-mg-animate>
+        {%- render 'responsive-image', image: section.settings.image, mobile: section.settings.image_mobile, sizes: '(min-width:1280px) 1200px, 100vw', class: 'mg-philosophy__img', aspect_ratio: section.settings.image_ratio -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="mg-philosophy__pillars" style="--pillars: {{ section.blocks.size }};">
+        {%- for block in section.blocks -%}
+          <div class="mg-philosophy__pillar" {{ block.shopify_attributes }} data-mg-animate>
+            {%- if block.settings.label != blank -%}<p class="mg-eyebrow mg-philosophy__pillar-label">{{ block.settings.label | escape }}</p>{%- endif -%}
+            {%- if block.settings.heading != blank -%}<h3 class="mg-philosophy__pillar-heading">{{ block.settings.heading | escape }}</h3>{%- endif -%}
+            {%- if block.settings.text != blank -%}<div class="mg-philosophy__pillar-text rte">{{ block.settings.text }}</div>{%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.signature_image != blank or section.settings.signature_text != blank -%}
+      <div class="mg-philosophy__signature" data-mg-animate>
+        {%- if section.settings.signature_image != blank -%}
+          {%- render 'responsive-image', image: section.settings.signature_image, sizes: '200px', class: 'mg-philosophy__signature-img', widths: '120,200,300,400' -%}
+        {%- else -%}
+          <p class="mg-philosophy__signature-text">{{ section.settings.signature_text | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.signature_caption != blank -%}<p class="mg-philosophy__signature-caption">{{ section.settings.signature_caption | escape }}</p>{%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-philosophy { background: var(--mg-phil-bg, var(--mg-bg-page)); color: var(--mg-phil-text, var(--mg-text)); padding-block: var(--mg-phil-pad-top, var(--mg-section-spacing)) var(--mg-phil-pad-bottom, var(--mg-section-spacing)); }
+.mg-philosophy__intro { text-align: center; margin-inline: auto; }
+.mg-philosophy__eyebrow { margin-bottom: var(--mg-space-4); }
+.mg-philosophy__heading { font-size: var(--mg-fs-display); font-weight: 300; line-height: var(--mg-lh-tight); color: inherit; margin-bottom: var(--mg-space-6); }
+.mg-philosophy__lead { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); color: var(--mg-text-secondary); max-width: 60ch; margin-inline: auto; }
+.mg-philosophy__lead > * + * { margin-top: var(--mg-space-4); }
+
+.mg-philosophy__media { margin-top: var(--mg-space-11); overflow: hidden; }
+.mg-philosophy__img { width: 100%; height: auto; display: block; }
+
+.mg-philosophy__pillars { display: grid; grid-template-columns: repeat(var(--pillars, 2), minmax(0, 1fr)); gap: var(--mg-space-9); margin-top: var(--mg-space-11); }
+.mg-philosophy__pillar-label { margin-bottom: var(--mg-space-3); }
+.mg-philosophy__pillar-heading { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); font-weight: 400; margin-bottom: var(--mg-space-3); color: inherit; }
+.mg-philosophy__pillar-text { color: var(--mg-text-secondary); line-height: var(--mg-lh-body); }
+
+.mg-philosophy__signature { text-align: center; margin-top: var(--mg-space-10); }
+.mg-philosophy__signature-img { width: auto; max-height: 72px; margin-inline: auto; }
+.mg-philosophy__signature-text { font-family: var(--mg-font-display); font-size: var(--mg-fs-section); font-style: italic; }
+.mg-philosophy__signature-caption { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-text-muted); margin-top: var(--mg-space-2); }
+
+[data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+
+@media (max-width: 989px) { .mg-philosophy__pillars { grid-template-columns: 1fr 1fr; gap: var(--mg-space-7); } }
+@media (max-width: 767px) { .mg-philosophy__pillars { grid-template-columns: 1fr; gap: var(--mg-space-6); } }
+@media (prefers-reduced-motion: reduce) { [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; } }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Brand philosophy",
+  "tag": "section",
+  "class": "mg-philosophy-section",
+  "settings": [
+    { "type": "header", "content": "Statement" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Philosophy" },
+    { "type": "textarea", "id": "heading", "label": "Statement heading", "default": "Luxury is not loud. It is the quiet confidence of craftsmanship." },
+    { "type": "richtext", "id": "lead", "label": "Lead text", "default": "<p>Madrishi Global was founded on a single belief: that true luxury endures. Each piece is an act of devotion to heritage and modern elegance.</p>" },
+
+    { "type": "header", "content": "Story image (optional)" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image" },
+    { "type": "select", "id": "image_ratio", "label": "Image ratio", "options": [ { "value": "16/9", "label": "Landscape (16:9)" }, { "value": "21/9", "label": "Cinematic (21:9)" }, { "value": "3/2", "label": "3:2" } ], "default": "21/9" },
+
+    { "type": "header", "content": "Signature (optional)" },
+    { "type": "image_picker", "id": "signature_image", "label": "Signature image" },
+    { "type": "text", "id": "signature_text", "label": "Signature text", "info": "Used if no image" },
+    { "type": "text", "id": "signature_caption", "label": "Signature caption", "default": "Founder & Creative Director" },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding top", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 200, "step": 8, "unit": "px", "label": "Padding bottom", "default": 120 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Pillar (Mission / Vision)",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Mission" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Craftsmanship without compromise" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>We partner with master artisans to create pieces designed to be treasured for generations.</p>" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Brand philosophy",
+      "blocks": [
+        { "type": "pillar", "settings": { "label": "Mission" } },
+        { "type": "pillar", "settings": { "label": "Vision", "heading": "A global house of modern heritage" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
