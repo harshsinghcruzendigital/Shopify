@@ -1,0 +1,66 @@
+{%- comment -%}
+  localization-form.liquid — reusable country/currency & language selector.
+  Reused by header and footer.
+  Params:
+    type:  'country' (currency/region) | 'language'
+    id:    unique id suffix (required, e.g. 'header', 'footer')
+  Relies on the <mg-localization> custom element (defined in header.liquid JS).
+{%- endcomment -%}
+{%- liquid
+  assign uid = id | default: 'loc'
+-%}
+
+{%- if type == 'country' and localization.available_countries.size > 1 -%}
+  {%- form 'localization', id: 'mg-country-' | append: uid, class: 'mg-localization' -%}
+    <mg-localization class="mg-localization__wrap" data-type="country">
+      <h2 class="visually-hidden">{{ 'localization.country_label' | t | default: 'Country/region' }}</h2>
+      <button type="button" class="mg-localization__current" aria-expanded="false" aria-haspopup="listbox" data-mg-loc-toggle>
+        {{ localization.country.name }} ({{ localization.country.currency.iso_code }} {{ localization.country.currency.symbol }})
+        {%- render 'icon', name: 'chevron-down', size: 14 -%}
+      </button>
+      <ul class="mg-localization__list" role="listbox" hidden>
+        {%- for country in localization.available_countries -%}
+          <li role="option" {% if country.iso_code == localization.country.iso_code %}aria-selected="true"{% endif %}>
+            <button
+              type="submit"
+              name="country_code"
+              value="{{ country.iso_code }}"
+              class="mg-localization__option {% if country.iso_code == localization.country.iso_code %}is-active{% endif %}"
+            >
+              {{ country.name }} <span class="mg-localization__currency">({{ country.currency.iso_code }} {{ country.currency.symbol }})</span>
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+      <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+    </mg-localization>
+  {%- endform -%}
+{%- endif -%}
+
+{%- if type == 'language' and localization.available_languages.size > 1 -%}
+  {%- form 'localization', id: 'mg-lang-' | append: uid, class: 'mg-localization' -%}
+    <mg-localization class="mg-localization__wrap" data-type="language">
+      <h2 class="visually-hidden">{{ 'localization.language_label' | t | default: 'Language' }}</h2>
+      <button type="button" class="mg-localization__current" aria-expanded="false" aria-haspopup="listbox" data-mg-loc-toggle>
+        {{ localization.language.endonym_name | capitalize }}
+        {%- render 'icon', name: 'chevron-down', size: 14 -%}
+      </button>
+      <ul class="mg-localization__list" role="listbox" hidden>
+        {%- for language in localization.available_languages -%}
+          <li role="option" {% if language.iso_code == localization.language.iso_code %}aria-selected="true"{% endif %}>
+            <button
+              type="submit"
+              name="locale_code"
+              value="{{ language.iso_code }}"
+              class="mg-localization__option {% if language.iso_code == localization.language.iso_code %}is-active{% endif %}"
+              lang="{{ language.iso_code }}"
+            >
+              {{ language.endonym_name | capitalize }}
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+      <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}">
+    </mg-localization>
+  {%- endform -%}
+{%- endif -%}

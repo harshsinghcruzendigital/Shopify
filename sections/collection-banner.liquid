@@ -1,0 +1,205 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Collection Page · Component 01: Collection Hero
+  Luxury collection banner bound to the `collection` object with
+  full merchant overrides. Two layouts: image banner (overlay) or
+  minimal editorial (no image). Breadcrumb, CTA, scroll indicator.
+  CSS-only scroll indicator (anchor link) — no JS required.
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.custom_heading | default: collection.title
+  assign description = section.settings.custom_description
+  if description == blank
+    assign description = collection.description
+  endif
+
+  assign banner_image = section.settings.image
+  if banner_image == blank and section.settings.use_collection_image
+    assign banner_image = collection.image
+  endif
+
+  assign is_minimal = false
+  if section.settings.layout == 'minimal'
+    assign is_minimal = true
+  endif
+
+  case section.settings.height
+    when 'small'
+      assign height_css = '36svh'
+    when 'medium'
+      assign height_css = '52svh'
+    when 'large'
+      assign height_css = '70svh'
+    else
+      assign height_css = section.settings.custom_height | append: 'px'
+  endcase
+-%}
+
+<section
+  class="mg-coll-hero mg-coll-hero--{{ section.settings.layout }} mg-coll-hero--{{ section.settings.alignment }} {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  {% unless is_minimal %}style="--mg-coll-hero-height: {{ height_css }};"{% endunless %}
+  {% if section.settings.animate %}data-mg-animate-section{% endif %}
+>
+  {%- unless is_minimal -%}
+    <div class="mg-coll-hero__media">
+      {%- if section.settings.video != blank -%}
+        {{ section.settings.video | video_tag: image_size: '1100x', loop: true, autoplay: true, muted: true, controls: false, class: 'mg-coll-hero__video' }}
+      {%- elsif banner_image != blank -%}
+        {%- render 'responsive-image', image: banner_image, mobile: section.settings.image_mobile, sizes: '100vw', class: 'mg-coll-hero__img', loading: 'eager', fetchpriority: 'high' -%}
+      {%- else -%}
+        <div class="mg-coll-hero__placeholder">{{ 'collection-1' | placeholder_svg_tag }}</div>
+      {%- endif -%}
+      {%- if section.settings.overlay_opacity > 0 -%}
+        <span class="mg-coll-hero__overlay" style="background: {{ section.settings.overlay_color }}; opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};" aria-hidden="true"></span>
+      {%- endif -%}
+    </div>
+  {%- endunless -%}
+
+  <div class="mg-coll-hero__inner mg-container">
+    <div class="mg-coll-hero__content" style="--mg-coll-hero-text: {% if is_minimal %}{{ section.settings.text_color_minimal }}{% else %}{{ section.settings.text_color }}{% endif %}; max-width: {{ section.settings.content_width }}px;">
+      {%- if section.settings.show_breadcrumb -%}
+        {%- render 'breadcrumbs', class: 'mg-coll-hero__breadcrumb' -%}
+      {%- endif -%}
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="mg-coll-hero__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      <h1 class="mg-coll-hero__title" data-mg-animate>{{ heading | escape }}</h1>
+
+      {%- if description != blank and section.settings.show_description -%}
+        <div class="mg-coll-hero__desc rte" data-mg-animate>{{ description }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.button_text != blank -%}
+        <div class="mg-coll-hero__actions" data-mg-animate>
+          <a class="mg-btn mg-btn--{{ section.settings.button_style }}" href="{{ section.settings.button_link | default: '#main-collection' }}">{{ section.settings.button_text | escape }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- unless is_minimal -%}
+    {%- if section.settings.show_scroll_indicator -%}
+      <a class="mg-coll-hero__scroll" href="#main-collection" aria-label="Scroll to products">
+        <span class="mg-coll-hero__scroll-line" aria-hidden="true"></span>
+      </a>
+    {%- endif -%}
+  {%- endunless -%}
+</section>
+
+{% stylesheet %}
+.mg-coll-hero { position: relative; }
+
+/* --- Image banner layout --- */
+.mg-coll-hero--banner {
+  display: flex;
+  align-items: center;
+  min-height: var(--mg-coll-hero-height, 52svh);
+  overflow: hidden;
+  background: var(--mg-navy-deep);
+}
+.mg-coll-hero--banner .mg-coll-hero__media { position: absolute; inset: 0; z-index: 0; }
+.mg-coll-hero__media .mg-picture, .mg-coll-hero__img, .mg-coll-hero__video, .mg-coll-hero__placeholder { width: 100%; height: 100%; }
+.mg-coll-hero__img, .mg-coll-hero__video { object-fit: cover; }
+.mg-coll-hero__overlay { position: absolute; inset: 0; }
+.mg-coll-hero--banner .mg-coll-hero__inner { position: relative; z-index: 1; width: 100%; }
+.mg-coll-hero--banner .mg-coll-hero__content { color: var(--mg-coll-hero-text, var(--mg-ivory)); }
+.mg-coll-hero--banner .mg-coll-hero__title { color: inherit; }
+.mg-coll-hero--banner .mg-coll-hero__desc { color: inherit; }
+
+/* --- Minimal editorial layout --- */
+.mg-coll-hero--minimal { padding-block: var(--mg-space-12) var(--mg-space-9); background: var(--mg-bg-page); border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-coll-hero--minimal .mg-coll-hero__content { color: var(--mg-coll-hero-text, var(--mg-text)); }
+
+/* --- Alignment --- */
+.mg-coll-hero--center .mg-coll-hero__content { margin-inline: auto; text-align: center; }
+.mg-coll-hero--left .mg-coll-hero__content { margin-right: auto; text-align: left; }
+.mg-coll-hero--right .mg-coll-hero__content { margin-left: auto; text-align: right; }
+
+/* --- Content --- */
+.mg-coll-hero__breadcrumb { margin-bottom: var(--mg-space-5); }
+.mg-coll-hero__eyebrow { margin-bottom: var(--mg-space-3); }
+.mg-coll-hero__title { font-size: var(--mg-fs-section); font-weight: 300; line-height: var(--mg-lh-tight); margin-bottom: var(--mg-space-4); }
+.mg-coll-hero--banner .mg-coll-hero__title { font-size: var(--mg-fs-hero); }
+.mg-coll-hero__desc { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); max-width: 64ch; }
+.mg-coll-hero--center .mg-coll-hero__desc { margin-inline: auto; }
+.mg-coll-hero__actions { margin-top: var(--mg-space-6); }
+
+/* --- Breadcrumbs (shared visual baseline) --- */
+.mg-breadcrumbs__list { display: flex; flex-wrap: wrap; align-items: center; gap: var(--mg-space-2); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; }
+.mg-breadcrumbs__item { display: inline-flex; align-items: center; gap: var(--mg-space-2); opacity: 0.85; }
+.mg-breadcrumbs__item:not(:last-child)::after { content: "/"; opacity: 0.5; }
+.mg-breadcrumbs__item--current { opacity: 1; color: var(--mg-gold); }
+.mg-breadcrumbs__link:hover { color: var(--mg-gold); }
+
+/* --- Scroll indicator --- */
+.mg-coll-hero__scroll { position: absolute; left: 50%; bottom: var(--mg-space-5); transform: translateX(-50%); z-index: 2; width: 24px; height: 40px; display: flex; justify-content: center; }
+.mg-coll-hero__scroll-line { width: 1px; height: 100%; background: var(--mg-ivory); transform-origin: top; animation: mg-coll-scroll 2s var(--mg-ease) infinite; }
+@keyframes mg-coll-scroll { 0% { transform: scaleY(0); transform-origin: top; } 40% { transform: scaleY(1); transform-origin: top; } 60% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+/* --- Scroll-reveal text --- */
+[data-mg-animate-section][data-mg-animate-section] [data-mg-animate] { opacity: 0; transform: translateY(20px); transition: opacity var(--mg-dur-slow) var(--mg-ease), transform var(--mg-dur-slow) var(--mg-ease); }
+[data-mg-animate-section].is-revealed [data-mg-animate] { opacity: 1; transform: none; }
+[data-mg-animate-section].is-revealed .mg-coll-hero__title { transition-delay: 80ms; }
+[data-mg-animate-section].is-revealed .mg-coll-hero__desc { transition-delay: 160ms; }
+[data-mg-animate-section].is-revealed .mg-coll-hero__actions { transition-delay: 240ms; }
+
+@media (max-width: 767px) {
+  .mg-coll-hero--minimal { padding-block: var(--mg-space-10) var(--mg-space-7); }
+  .mg-coll-hero__scroll { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mg-coll-hero__scroll-line { animation: none; }
+  [data-mg-animate-section] [data-mg-animate] { opacity: 1 !important; transform: none !important; }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Collection hero",
+  "tag": "section",
+  "class": "mg-coll-hero-section",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "layout", "label": "Layout", "options": [ { "value": "banner", "label": "Image banner" }, { "value": "minimal", "label": "Minimal editorial (no image)" } ], "default": "banner" },
+    { "type": "select", "id": "alignment", "label": "Alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+    { "type": "range", "id": "content_width", "min": 400, "max": 900, "step": 20, "unit": "px", "label": "Content width", "default": 720 },
+    { "type": "select", "id": "height", "label": "Banner height", "options": [ { "value": "small", "label": "Small" }, { "value": "medium", "label": "Medium" }, { "value": "large", "label": "Large" }, { "value": "custom", "label": "Custom" } ], "default": "medium" },
+    { "type": "range", "id": "custom_height", "min": 300, "max": 800, "step": 20, "unit": "px", "label": "Custom height", "default": 480 },
+
+    { "type": "header", "content": "Media (image banner)" },
+    { "type": "checkbox", "id": "use_collection_image", "label": "Use collection image", "default": true },
+    { "type": "image_picker", "id": "image", "label": "Override desktop image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image" },
+    { "type": "video", "id": "video", "label": "Background video" },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#11182B" },
+    { "type": "range", "id": "overlay_opacity", "min": 0, "max": 80, "step": 5, "unit": "%", "label": "Overlay opacity", "default": 35 },
+    { "type": "color", "id": "text_color", "label": "Text color (banner)", "default": "#F7F4EC" },
+
+    { "type": "header", "content": "Content" },
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "custom_heading", "label": "Heading", "info": "Defaults to the collection title" },
+    { "type": "checkbox", "id": "show_description", "label": "Show description", "default": true },
+    { "type": "richtext", "id": "custom_description", "label": "Description", "info": "Defaults to the collection description" },
+    { "type": "color", "id": "text_color_minimal", "label": "Text color (minimal)", "default": "#1C1C1C" },
+
+    { "type": "header", "content": "Button" },
+    { "type": "text", "id": "button_text", "label": "Label" },
+    { "type": "url", "id": "button_link", "label": "Link", "info": "Defaults to scrolling to products" },
+    { "type": "select", "id": "button_style", "label": "Style", "options": [ { "value": "primary", "label": "Primary" }, { "value": "secondary", "label": "Secondary" }, { "value": "outline", "label": "Outline" }, { "value": "ghost", "label": "Ghost" } ], "default": "outline" },
+
+    { "type": "header", "content": "Effects & Advanced" },
+    { "type": "checkbox", "id": "show_scroll_indicator", "label": "Show scroll indicator", "default": true },
+    { "type": "checkbox", "id": "animate", "label": "Animate on scroll", "default": true },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "presets": [ { "name": "Collection hero" } ],
+  "enabled_on": { "templates": ["collection"] }
+}
+{% endschema %}

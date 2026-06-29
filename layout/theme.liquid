@@ -32,9 +32,11 @@
     {% comment %} --- Design tokens: defaults then merchant overrides --- {% endcomment %}
     {{ 'variables.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
     {% render 'css-variables' %}
 
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
 
     {{ content_for_header }}
   </head>

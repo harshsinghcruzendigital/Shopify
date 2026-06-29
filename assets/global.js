@@ -85,6 +85,9 @@
       off(name, cb) {
         if (map[name]) map[name] = map[name].filter((f) => f !== cb);
       },
+      hasListener(name) {
+        return Boolean(map[name] && map[name].length);
+      },
       emit(name, detail) {
         (map[name] || []).forEach((cb) => cb(detail));
       }

@@ -1,0 +1,476 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Header
+  Luxury header with sticky / transparent / shrink-on-scroll,
+  desktop nav + dropdowns (mega menu enhanced in Component 3),
+  search / account / wishlist / cart triggers, localization.
+  Custom element: <mg-header> (+ <mg-localization>)
+  Triggers (data attributes) are progressively enhanced by later
+  components; today they fall back to real navigation.
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign is_transparent = false
+  if section.settings.transparent and template.name == 'index'
+    assign is_transparent = true
+  endif
+-%}
+
+<mg-header
+  class="mg-header
+    {% if section.settings.sticky %}mg-header--sticky{% endif %}
+    {% if section.settings.shrink_on_scroll %}mg-header--shrink{% endif %}
+    {% if is_transparent %}mg-header--transparent{% endif %}
+    mg-header--{{ section.settings.layout }}
+    {% if section.settings.border_bottom %}mg-header--bordered{% endif %}
+    {{ section.settings.custom_class }}"
+  {% if section.settings.sticky %}data-sticky="true"{% endif %}
+  {% if section.settings.shrink_on_scroll %}data-shrink="true"{% endif %}
+  {% if is_transparent %}data-transparent="true"{% endif %}
+  style="
+    --mg-header-bg: {{ section.settings.background }};
+    --mg-header-text: {{ section.settings.text_color }};
+    --mg-header-transparent-text: {{ section.settings.transparent_text_color }};
+    --mg-header-height: {{ section.settings.desktop_height }}px;
+    --mg-header-height-shrink: {{ section.settings.shrink_height }}px;
+    --mg-header-height-mobile: {{ section.settings.mobile_height }}px;
+  "
+>
+  <div class="mg-header__inner mg-container">
+
+    {%- comment -%} Left cluster: mobile menu toggle {%- endcomment -%}
+    <div class="mg-header__cluster mg-header__cluster--left">
+      <button
+        class="mg-header__icon-btn mg-hide-desktop"
+        type="button"
+        aria-label="{{ 'general.accessibility.menu' | t | default: 'Menu' }}"
+        aria-expanded="false"
+        aria-controls="mg-mobile-nav"
+        data-mg-menu-open
+      >
+        {%- render 'icon', name: 'menu' -%}
+      </button>
+
+      {%- if section.settings.layout == 'logo-left' -%}
+        <nav class="mg-header__nav mg-hide-mobile" aria-label="{{ 'general.accessibility.primary_nav' | t | default: 'Primary' }}">
+          {%- render 'header-menu', menu: section.settings.menu -%}
+        </nav>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Center: logo {%- endcomment -%}
+    <div class="mg-header__logo">
+      {%- if request.page_type == 'index' -%}<h1 class="mg-header__logo-heading">{%- else -%}<div class="mg-header__logo-heading">{%- endif -%}
+        <a href="{{ routes.root_url }}" class="mg-header__logo-link" aria-label="{{ shop.name }}">
+          {%- if settings.logo != blank -%}
+            {%- assign logo_alt = settings.logo.alt | default: shop.name -%}
+            <img
+              class="mg-header__logo-img mg-hide-mobile"
+              src="{{ settings.logo | image_url: width: 600 }}"
+              srcset="{{ settings.logo | image_url: width: 300 }} 300w, {{ settings.logo | image_url: width: 600 }} 600w"
+              sizes="{{ settings.logo_width }}px"
+              width="{{ settings.logo.width }}"
+              height="{{ settings.logo.height }}"
+              alt="{{ logo_alt | escape }}"
+              style="width: {{ settings.logo_width }}px;"
+              loading="eager"
+            >
+            {%- if settings.logo_mobile != blank -%}
+              <img
+                class="mg-header__logo-img mg-hide-desktop"
+                src="{{ settings.logo_mobile | image_url: width: 400 }}"
+                width="{{ settings.logo_mobile.width }}"
+                height="{{ settings.logo_mobile.height }}"
+                alt="{{ logo_alt | escape }}"
+                style="width: {{ settings.logo_width | times: 0.8 | round }}px;"
+                loading="eager"
+              >
+            {%- else -%}
+              <img
+                class="mg-header__logo-img mg-hide-desktop"
+                src="{{ settings.logo | image_url: width: 400 }}"
+                width="{{ settings.logo.width }}"
+                height="{{ settings.logo.height }}"
+                alt="{{ logo_alt | escape }}"
+                style="width: {{ settings.logo_width | times: 0.8 | round }}px;"
+                loading="eager"
+              >
+            {%- endif -%}
+          {%- else -%}
+            <span class="mg-header__logo-text">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+      {%- if request.page_type == 'index' -%}</h1>{%- else -%}</div>{%- endif -%}
+    </div>
+
+    {%- comment -%} Right cluster: actions {%- endcomment -%}
+    <div class="mg-header__cluster mg-header__cluster--right">
+      {%- if section.settings.show_localization -%}
+        <div class="mg-header__localization mg-hide-mobile">
+          {%- render 'localization-form', type: 'country', id: 'header' -%}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.show_language -%}
+        <div class="mg-header__localization mg-hide-mobile">
+          {%- render 'localization-form', type: 'language', id: 'header' -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_search -%}
+        <a class="mg-header__icon-btn" href="{{ routes.search_url }}" aria-label="{{ 'general.accessibility.search' | t | default: 'Search' }}" data-mg-search-open>
+          {%- render 'icon', name: 'search' -%}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_account -%}
+        <a class="mg-header__icon-btn mg-hide-mobile" href="{{ routes.account_url }}" aria-label="{{ 'general.accessibility.account' | t | default: 'Account' }}">
+          {%- render 'icon', name: 'user' -%}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_wishlist -%}
+        <button class="mg-header__icon-btn mg-header__wishlist" type="button" aria-label="{{ 'general.accessibility.wishlist' | t | default: 'Wishlist' }}" data-mg-wishlist-open>
+          {%- render 'icon', name: 'heart' -%}
+          <span class="mg-header__count" data-mg-wishlist-count hidden>0</span>
+        </button>
+      {%- endif -%}
+
+      {%- if section.settings.show_cart -%}
+        <a class="mg-header__icon-btn mg-header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'general.accessibility.cart' | t | default: 'Cart' }}" data-mg-cart-open>
+          {%- render 'icon', name: 'bag' -%}
+          <span class="mg-header__count{% if cart.item_count == 0 %} is-empty{% endif %}" data-mg-cart-count>{{ cart.item_count }}</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} Logo-center layout: nav sits on its own row below {%- endcomment -%}
+  {%- if section.settings.layout == 'logo-center' -%}
+    <nav class="mg-header__nav mg-header__nav--row mg-hide-mobile" aria-label="{{ 'general.accessibility.primary_nav' | t | default: 'Primary' }}">
+      <div class="mg-container">
+        {%- render 'header-menu', menu: section.settings.menu -%}
+      </div>
+    </nav>
+  {%- endif -%}
+</mg-header>
+
+{%- comment -%} Sentinel for sticky/transparent scroll detection (no layout cost) {%- endcomment -%}
+<div class="mg-header__sentinel" aria-hidden="true"></div>
+
+{% stylesheet %}
+.mg-header {
+  --_text: var(--mg-header-text, var(--mg-navy));
+  position: relative;
+  z-index: var(--mg-z-sticky-header);
+  background: var(--mg-header-bg, var(--mg-cream));
+  color: var(--_text);
+  transition: background var(--mg-dur-base) var(--mg-ease), color var(--mg-dur-base) var(--mg-ease), box-shadow var(--mg-dur-base) var(--mg-ease);
+}
+.mg-header--bordered { border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+
+.mg-header__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--mg-space-4);
+  min-height: var(--mg-header-height, 80px);
+  transition: min-height var(--mg-dur-base) var(--mg-ease);
+}
+.mg-header__cluster { display: flex; align-items: center; gap: var(--mg-space-2); }
+.mg-header__cluster--right { justify-content: flex-end; }
+.mg-header__logo { display: flex; justify-content: center; }
+.mg-header__logo-heading { margin: 0; font-size: inherit; line-height: 0; }
+.mg-header__logo-text {
+  font-family: var(--mg-font-display);
+  font-size: var(--mg-fs-collection-title);
+  letter-spacing: var(--mg-track-wide);
+  color: var(--_text);
+}
+.mg-header__logo-img { transition: width var(--mg-dur-base) var(--mg-ease); }
+
+/* Logo-left: logo in left cluster, nav inline */
+.mg-header--logo-left .mg-header__inner { grid-template-columns: auto 1fr auto; }
+.mg-header--logo-left .mg-header__logo { order: -1; justify-content: flex-start; }
+.mg-header--logo-left .mg-header__cluster--left { gap: var(--mg-space-6); }
+
+/* Icon buttons */
+.mg-header__icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  color: var(--_text);
+  transition: color var(--mg-dur-base) var(--mg-ease), opacity var(--mg-dur-base) var(--mg-ease);
+}
+.mg-header__icon-btn:hover { color: var(--mg-gold); }
+.mg-header__icon-btn svg { width: 22px; height: 22px; }
+
+.mg-header__count {
+  position: absolute;
+  top: 4px; right: 2px;
+  min-width: 18px; height: 18px;
+  padding: 0 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--mg-gold);
+  color: var(--mg-navy);
+  font-family: var(--mg-font-eyebrow);
+  font-size: 10px; font-weight: 600;
+  border-radius: var(--mg-radius-pill);
+  line-height: 1;
+}
+.mg-header__count.is-empty { display: none; }
+
+/* Navigation */
+.mg-header__menu { display: flex; align-items: center; gap: var(--mg-space-6); }
+.mg-header__nav--row { border-top: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-header__nav--row .mg-header__menu { justify-content: center; min-height: 52px; }
+.mg-header__item { position: relative; }
+.mg-header__link {
+  display: inline-flex; align-items: center; gap: var(--mg-space-1);
+  padding-block: var(--mg-space-3);
+  font-family: var(--mg-font-eyebrow);
+  font-size: var(--mg-fs-nav);
+  font-weight: 500;
+  letter-spacing: var(--mg-track-wider);
+  text-transform: uppercase;
+  color: var(--_text);
+}
+.mg-header__link:hover,
+.mg-header__item:focus-within > .mg-header__link { color: var(--mg-gold); }
+.mg-header__link svg { width: 14px; height: 14px; }
+
+/* Dropdown */
+.mg-header__dropdown {
+  position: absolute;
+  top: 100%; left: 0;
+  min-width: 220px;
+  padding: var(--mg-space-4) 0;
+  background: var(--mg-white);
+  border: var(--mg-border-hairline) solid var(--mg-border-card);
+  box-shadow: var(--mg-shadow-md);
+  opacity: 0; visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--mg-dur-base) var(--mg-ease), transform var(--mg-dur-base) var(--mg-ease), visibility var(--mg-dur-base);
+  z-index: var(--mg-z-dropdown);
+}
+.mg-header__item.has-dropdown:hover > .mg-header__dropdown,
+.mg-header__item.has-dropdown:focus-within > .mg-header__dropdown {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.mg-header__dropdown a {
+  display: block;
+  padding: var(--mg-space-2) var(--mg-space-5);
+  font-family: var(--mg-font-body);
+  font-size: var(--mg-fs-body-sm);
+  letter-spacing: var(--mg-track-normal);
+  text-transform: none;
+  color: var(--mg-text);
+}
+.mg-header__dropdown a:hover { color: var(--mg-gold); background: var(--mg-gray-soft); }
+.mg-header__subdropdown { padding-left: var(--mg-space-3); }
+.mg-header__subdropdown a { color: var(--mg-text-secondary); font-size: var(--mg-fs-caption); }
+
+/* Localization */
+.mg-localization__wrap { position: relative; }
+.mg-localization__current {
+  display: inline-flex; align-items: center; gap: var(--mg-space-1);
+  padding: var(--mg-space-2);
+  font-family: var(--mg-font-eyebrow);
+  font-size: var(--mg-fs-caption);
+  letter-spacing: var(--mg-track-wide);
+  color: var(--_text);
+}
+.mg-localization__current:hover { color: var(--mg-gold); }
+.mg-localization__list {
+  position: absolute;
+  top: 100%; right: 0;
+  min-width: 200px;
+  max-height: 320px; overflow-y: auto;
+  padding: var(--mg-space-2) 0;
+  background: var(--mg-white);
+  border: var(--mg-border-hairline) solid var(--mg-border-card);
+  box-shadow: var(--mg-shadow-md);
+  z-index: var(--mg-z-dropdown);
+}
+.mg-localization__option {
+  display: block; width: 100%;
+  padding: var(--mg-space-2) var(--mg-space-4);
+  text-align: left;
+  font-size: var(--mg-fs-body-sm);
+  color: var(--mg-text);
+}
+.mg-localization__option:hover { background: var(--mg-gray-soft); color: var(--mg-gold); }
+.mg-localization__option.is-active { color: var(--mg-gold); }
+.mg-localization__currency { color: var(--mg-text-muted); }
+
+/* Sticky */
+.mg-header--sticky.is-sticky {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  box-shadow: var(--mg-shadow-sm);
+}
+.mg-header__sentinel { height: 0; }
+body.mg-has-sticky-spacer { /* spacer applied via JS to prevent jump */ }
+
+/* Shrink */
+.mg-header--shrink.is-shrunk .mg-header__inner { min-height: var(--mg-header-height-shrink, 60px); }
+.mg-header--shrink.is-shrunk .mg-header__logo-img { width: 80% !important; }
+
+/* Transparent over hero */
+.mg-header--transparent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  background: transparent;
+  color: var(--mg-header-transparent-text, #fff);
+}
+.mg-header--transparent .mg-header__link,
+.mg-header--transparent .mg-header__icon-btn,
+.mg-header--transparent .mg-header__logo-text,
+.mg-header--transparent .mg-localization__current { color: var(--mg-header-transparent-text, #fff); }
+.mg-header--transparent.is-solid {
+  position: fixed;
+  background: var(--mg-header-bg, var(--mg-cream));
+  color: var(--_text);
+  box-shadow: var(--mg-shadow-sm);
+}
+.mg-header--transparent.is-solid .mg-header__link,
+.mg-header--transparent.is-solid .mg-header__icon-btn,
+.mg-header--transparent.is-solid .mg-header__logo-text,
+.mg-header--transparent.is-solid .mg-localization__current { color: var(--_text); }
+
+@media (max-width: 989px) {
+  .mg-header__inner { min-height: var(--mg-header-height-mobile, 64px); }
+  .mg-header__cluster { gap: 0; }
+}
+{% endstyle %}
+
+{% javascript %}
+class MGHeader extends HTMLElement {
+  connectedCallback() {
+    this.sticky = this.dataset.sticky === 'true';
+    this.shrink = this.dataset.shrink === 'true';
+    this.transparent = this.dataset.transparent === 'true';
+    this.threshold = 60;
+    this.sentinel = this.nextElementSibling;
+    this._setHeightVar();
+
+    this._onScroll = this._onScroll.bind(this);
+    if (this.sticky || this.shrink || this.transparent) {
+      window.addEventListener('scroll', this._onScroll, { passive: true });
+      this._onScroll();
+    }
+    window.addEventListener('resize',
+      (window.MG ? MG.utils.debounce(() => this._setHeightVar(), 150) : () => this._setHeightVar())
+    );
+
+    // Trigger hooks for later components (drawers). Fallback links still work.
+    this._wireTrigger('[data-mg-menu-open]', 'mobile-nav:open');
+    this._wireTrigger('[data-mg-search-open]', 'search:open');
+    this._wireTrigger('[data-mg-wishlist-open]', 'wishlist:open');
+    this._wireTrigger('[data-mg-cart-open]', 'cart:open');
+  }
+
+  disconnectedCallback() { window.removeEventListener('scroll', this._onScroll); }
+
+  _setHeightVar() {
+    document.documentElement.style.setProperty('--mg-header-current-height', this.offsetHeight + 'px');
+  }
+
+  _wireTrigger(selector, eventName) {
+    const el = this.querySelector(selector);
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      // Only hijack if a listener exists for the enhanced behaviour
+      if (window.MG && MG.events && MG.events.hasListener && MG.events.hasListener(eventName)) {
+        e.preventDefault();
+      }
+      MG.events && MG.events.emit(eventName, { trigger: el });
+    });
+  }
+
+  _onScroll() {
+    const y = window.scrollY;
+    if (this.sticky && !this.transparent) {
+      const wasSticky = this.classList.contains('is-sticky');
+      const makeSticky = y > this.threshold;
+      if (makeSticky !== wasSticky) {
+        this.classList.toggle('is-sticky', makeSticky);
+        document.body.style.paddingTop = makeSticky ? this.offsetHeight + 'px' : '';
+      }
+    }
+    if (this.transparent) {
+      this.classList.toggle('is-solid', y > this.threshold);
+    }
+    if (this.shrink) {
+      this.classList.toggle('is-shrunk', y > this.threshold);
+    }
+  }
+}
+if (!customElements.get('mg-header')) customElements.define('mg-header', MGHeader);
+
+class MGLocalization extends HTMLElement {
+  connectedCallback() {
+    this.toggle = this.querySelector('[data-mg-loc-toggle]');
+    this.list = this.querySelector('.mg-localization__list');
+    if (!this.toggle || !this.list) return;
+    this.toggle.addEventListener('click', () => this.toggleOpen());
+    document.addEventListener('click', (e) => { if (!this.contains(e.target)) this.close(); });
+    this.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.close(); });
+  }
+  toggleOpen() { this.list.hidden ? this.open() : this.close(); }
+  open() { this.list.hidden = false; this.toggle.setAttribute('aria-expanded', 'true'); }
+  close() { this.list.hidden = true; this.toggle.setAttribute('aria-expanded', 'false'); }
+}
+if (!customElements.get('mg-localization')) customElements.define('mg-localization', MGLocalization);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "header",
+  "class": "mg-header-section",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "logo-left", "label": "Logo left, inline navigation" },
+        { "value": "logo-center", "label": "Logo centered, navigation below" }
+      ],
+      "default": "logo-center"
+    },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+
+    { "type": "header", "content": "Behaviour" },
+    { "type": "checkbox", "id": "sticky", "label": "Sticky header on scroll", "default": true },
+    { "type": "checkbox", "id": "shrink_on_scroll", "label": "Shrink on scroll", "default": true },
+    { "type": "checkbox", "id": "transparent", "label": "Transparent over homepage hero", "default": false },
+    { "type": "checkbox", "id": "border_bottom", "label": "Show bottom border", "default": true },
+
+    { "type": "header", "content": "Heights" },
+    { "type": "range", "id": "desktop_height", "min": 56, "max": 120, "step": 4, "unit": "px", "label": "Desktop height", "default": 80 },
+    { "type": "range", "id": "shrink_height", "min": 48, "max": 96, "step": 4, "unit": "px", "label": "Shrunk height", "default": 60 },
+    { "type": "range", "id": "mobile_height", "min": 48, "max": 88, "step": 4, "unit": "px", "label": "Mobile height", "default": 64 },
+
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#1B2A4A" },
+    { "type": "color", "id": "transparent_text_color", "label": "Text (transparent state)", "default": "#FFFFFF" },
+
+    { "type": "header", "content": "Actions" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show account", "default": true },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist", "default": true },
+    { "type": "checkbox", "id": "show_cart", "label": "Show cart", "default": true },
+    { "type": "checkbox", "id": "show_localization", "label": "Show country/currency selector", "default": false },
+    { "type": "checkbox", "id": "show_language", "label": "Show language selector", "default": false },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ]
+}
+{% endschema %}

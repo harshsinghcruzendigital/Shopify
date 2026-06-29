@@ -1,0 +1,103 @@
+/* ============================================================
+   Madrishi Global — components.css
+   Global reusable UI primitives (buttons, image placeholder,
+   section header). Per-section styling stays in each section's
+   {% stylesheet %}. Grows as shared components are introduced.
+   ============================================================ */
+
+/* ---------- Buttons (Design System §8) ---------- */
+.mg-btn {
+  --_btn-h: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mg-space-2);
+  min-height: var(--_btn-h);
+  padding-inline: var(--mg-space-7);
+  font-family: var(--mg-font-eyebrow);
+  font-size: var(--mg-fs-button);
+  font-weight: 600;
+  letter-spacing: var(--mg-track-widest);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  border: var(--mg-border-hairline) solid transparent;
+  border-radius: var(--mg-radius-none);
+  cursor: pointer;
+  transition: background-color var(--mg-dur-base) var(--mg-ease),
+              color var(--mg-dur-base) var(--mg-ease),
+              border-color var(--mg-dur-base) var(--mg-ease),
+              transform var(--mg-dur-base) var(--mg-ease);
+}
+.mg-btn:hover { transform: translateY(-2px); }
+.mg-btn:active { transform: translateY(0); }
+.mg-btn svg { width: 18px; height: 18px; }
+
+.mg-btn--primary { background: var(--mg-navy); color: var(--mg-ivory); }
+.mg-btn--primary:hover { background: var(--mg-navy-deep); color: var(--mg-ivory); }
+
+.mg-btn--secondary { background: var(--mg-gold); color: var(--mg-navy); }
+.mg-btn--secondary:hover { background: var(--mg-bronze); color: var(--mg-ivory); }
+
+.mg-btn--outline { background: transparent; color: var(--mg-navy); border-color: var(--mg-navy); }
+.mg-btn--outline:hover { background: var(--mg-navy); color: var(--mg-ivory); }
+
+.mg-btn--ghost { background: transparent; color: var(--mg-navy); }
+.mg-btn--ghost:hover { background: rgba(27, 42, 74, 0.06); color: var(--mg-navy); }
+
+/* Text button — gold underline grows on hover */
+.mg-btn--text {
+  min-height: 0; padding: 0;
+  background: transparent; color: var(--mg-navy);
+  position: relative;
+}
+.mg-btn--text::after {
+  content: ""; position: absolute; left: 0; bottom: -4px;
+  width: 100%; height: 1px; background: var(--mg-gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--mg-dur-base) var(--mg-ease);
+}
+.mg-btn--text:hover { transform: none; }
+.mg-btn--text:hover::after { transform: scaleX(1); }
+
+/* Icon button */
+.mg-btn--icon {
+  width: 44px; height: 44px; min-height: 0; padding: 0;
+  border-radius: var(--mg-radius-xs);
+  background: transparent; color: var(--mg-navy);
+}
+.mg-btn--icon:hover { background: rgba(27, 42, 74, 0.06); transform: none; }
+
+/* States */
+.mg-btn[disabled], .mg-btn.is-disabled {
+  opacity: var(--mg-opacity-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.mg-btn.is-loading { color: transparent; pointer-events: none; position: relative; }
+.mg-btn.is-loading::after {
+  content: ""; position: absolute;
+  width: 18px; height: 18px;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%;
+  animation: mg-spin 0.7s linear infinite;
+  color: var(--mg-ivory);
+}
+@keyframes mg-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 767px) {
+  .mg-btn { --_btn-h: 48px; padding-inline: var(--mg-space-6); }
+}
+
+/* ---------- Image placeholder ---------- */
+.mg-image-placeholder { display: block; width: 100%; background: var(--mg-gray-soft); }
+.mg-image-placeholder svg,
+.mg-image-placeholder__svg { width: 100%; height: 100%; fill: var(--mg-gray-neutral); }
+
+/* ---------- Shared section header ---------- */
+.mg-section-header { margin-bottom: var(--mg-space-9); }
+.mg-section-header__eyebrow { margin-bottom: var(--mg-space-3); }
+.mg-section-header__title { font-size: var(--mg-fs-section); }
+.mg-section-header__text { color: var(--mg-text-secondary); max-width: 60ch; }
+.mg-section-header--center { text-align: center; }
+.mg-section-header--center .mg-section-header__text { margin-inline: auto; }

@@ -6,12 +6,27 @@
       "previous": "Previous",
       "next": "Next",
       "pause": "Pause announcements",
-      "play": "Play announcements"
+      "play": "Play announcements",
+      "menu": "Menu",
+      "primary_nav": "Primary",
+      "search": "Search",
+      "account": "Account",
+      "wishlist": "Wishlist",
+      "cart": "Cart"
     },
     "meta": {
       "tags": "Tagged \"{{ tags }}\"",
       "page": "Page {{ page }}"
+    },
+    "breadcrumbs": {
+      "aria": "Breadcrumb",
+      "home": "Home",
+      "search": "Search"
     }
+  },
+  "localization": {
+    "country_label": "Country/region",
+    "language_label": "Language"
   },
   "sections": {
     "announcement_bar": {

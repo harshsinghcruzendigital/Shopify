@@ -1,0 +1,67 @@
+{%- comment -%}
+  responsive-image.liquid — central image renderer.
+  One renderer for the whole theme: consistent srcset, lazy-loading,
+  CLS prevention (width/height/aspect-ratio) and optional art direction.
+
+  Params:
+    image          (required) image_object
+    mobile         (optional) image_object for <picture> art direction
+    alt            (optional) overrides image.alt
+    sizes          (optional) default '100vw'
+    widths         (optional) comma string, default responsive set
+    class          (optional) css class on <img>
+    wrapper_class  (optional) css class on <picture> / wrapper
+    loading        (optional) 'lazy' (default) | 'eager'
+    fetchpriority  (optional) 'high' | 'low' | 'auto'
+    aspect_ratio   (optional) e.g. '16/9'; defaults to image.aspect_ratio
+    mobile_media   (optional) max-width for mobile source, default 767px
+{%- endcomment -%}
+{%- liquid
+  assign widths_str = widths | default: '375,550,750,1100,1500,1900,2200,2800'
+  assign widths_arr = widths_str | split: ','
+  assign img_sizes = sizes | default: '100vw'
+  assign img_loading = loading | default: 'lazy'
+  assign img_alt = alt | default: image.alt | escape
+  assign ratio = aspect_ratio
+  assign mobile_bp = mobile_media | default: '767px'
+-%}
+
+{%- if image == blank -%}
+  <div class="mg-image-placeholder {{ wrapper_class }}" style="aspect-ratio: {{ ratio | default: '3/4' }};">
+    {{ 'image' | placeholder_svg_tag: 'mg-image-placeholder__svg' }}
+  </div>
+{%- else -%}
+  {%- capture srcset -%}
+    {%- for w in widths_arr -%}
+      {%- assign wn = w | plus: 0 -%}
+      {%- if wn <= image.width -%}{{ image | image_url: width: wn }} {{ wn }}w, {% endif -%}
+    {%- endfor -%}
+    {{ image | image_url: width: image.width }} {{ image.width }}w
+  {%- endcapture -%}
+
+  <picture class="mg-picture {{ wrapper_class }}">
+    {%- if mobile != blank -%}
+      {%- capture mobile_srcset -%}
+        {%- for w in widths_arr -%}
+          {%- assign wn = w | plus: 0 -%}
+          {%- if wn <= mobile.width -%}{{ mobile | image_url: width: wn }} {{ wn }}w, {% endif -%}
+        {%- endfor -%}
+        {{ mobile | image_url: width: mobile.width }} {{ mobile.width }}w
+      {%- endcapture -%}
+      <source media="(max-width: {{ mobile_bp }})" srcset="{{ mobile_srcset }}" sizes="{{ img_sizes }}">
+    {%- endif -%}
+    <img
+      class="mg-image {{ class }}"
+      src="{{ image | image_url: width: 1100 }}"
+      srcset="{{ srcset }}"
+      sizes="{{ img_sizes }}"
+      alt="{{ img_alt }}"
+      width="{{ image.width }}"
+      height="{{ image.height }}"
+      {% if ratio != blank %}style="aspect-ratio: {{ ratio }};"{% endif %}
+      loading="{{ img_loading }}"
+      {% if fetchpriority %}fetchpriority="{{ fetchpriority }}"{% endif %}
+      decoding="async"
+    >
+  </picture>
+{%- endif -%}

@@ -27,7 +27,21 @@
         "pause_on_hover": true,
         "animate": true
       }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "layout": "logo-center",
+        "sticky": true,
+        "shrink_on_scroll": true,
+        "transparent": false,
+        "border_bottom": true,
+        "show_search": true,
+        "show_account": true,
+        "show_wishlist": true,
+        "show_cart": true
+      }
     }
   },
-  "order": ["announcement-bar"]
+  "order": ["announcement-bar", "header"]
 }

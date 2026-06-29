@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "collection-hero": {
+      "type": "collection-banner",
+      "settings": {
+        "layout": "banner",
+        "alignment": "center",
+        "height": "medium",
+        "use_collection_image": true,
+        "show_breadcrumb": true,
+        "show_description": true,
+        "overlay_opacity": 35
+      }
+    }
+  },
+  "order": ["collection-hero"]
+}

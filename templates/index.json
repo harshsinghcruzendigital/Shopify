@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-banner",
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "Madrishi Global",
+            "heading": "Timeless Luxury, Globally Crafted",
+            "subheading": "<p>Discover pieces created for those who value heritage and craftsmanship.</p>",
+            "content_alignment": "center",
+            "button_1_text": "Discover the collection",
+            "button_1_style": "primary",
+            "button_2_text": "Our story",
+            "button_2_style": "outline",
+            "overlay_opacity": 35
+          }
+        }
+      },
+      "block_order": ["slide-1"]
+    }
+  },
+  "order": ["hero"]
+}
