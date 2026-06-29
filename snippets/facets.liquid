@@ -1,0 +1,106 @@
+{%- comment -%}
+  facets.liquid — renders collection.filters as an accessible filter form.
+  One form serves both the desktop sidebar and the mobile drawer (CSS
+  positions it). Submits natively (GET) without JS; <mg-collection>
+  enhances it with AJAX. Param: results (collection or search object).
+{%- endcomment -%}
+{%- liquid
+  assign results = results | default: collection
+  assign sort_by = results.sort_by | default: results.default_sort_by
+
+  assign active_count = 0
+  for filter in results.filters
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<form class="mg-facets" data-mg-filter-form method="get" action="{{ results.url }}">
+  {%- if sort_by != blank -%}<input type="hidden" name="sort_by" value="{{ sort_by }}">{%- endif -%}
+
+  <div class="mg-facets__head">
+    <span class="mg-facets__title">{{ 'collection.filters.title' | t | default: 'Filter' }}{% if active_count > 0 %} ({{ active_count }}){% endif %}</span>
+    <button class="mg-facets__close" type="button" data-mg-filter-close aria-label="{{ 'general.accessibility.close' | t }}">{%- render 'icon', name: 'close', size: 18 -%}</button>
+  </div>
+
+  {%- comment -%} Active filter chips {%- endcomment -%}
+  {%- if active_count > 0 -%}
+    <div class="mg-facets__active">
+      {%- for filter in results.filters -%}
+        {%- for value in filter.active_values -%}
+          <a class="mg-facets__chip" data-mg-chip href="{{ value.url_to_remove }}">
+            <span>{{ value.label | escape }}</span>{%- render 'icon', name: 'close', size: 12 -%}
+          </a>
+        {%- endfor -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+            <a class="mg-facets__chip" data-mg-chip href="{{ filter.url_to_remove }}">
+              <span>{{ filter.min_value.value | default: 0 | money }} – {{ filter.max_value.value | default: filter.range_max | money }}</span>{%- render 'icon', name: 'close', size: 12 -%}
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <a class="mg-facets__clear" data-mg-clear href="{{ results.url }}{% if sort_by %}?sort_by={{ sort_by }}{% endif %}">{{ 'collection.empty.clear' | t | default: 'Clear all' }}</a>
+    </div>
+  {%- endif -%}
+
+  {%- for filter in results.filters -%}
+    {%- assign open = false -%}
+    {%- if filter.active_values.size > 0 or forloop.index <= 2 -%}{%- assign open = true -%}{%- endif -%}
+    <div class="mg-facet" data-mg-facet>
+      <button class="mg-facet__toggle" type="button" data-mg-facet-toggle aria-expanded="{{ open }}">
+        <span>{{ filter.label | escape }}{% if filter.active_values.size > 0 %} ({{ filter.active_values.size }}){% endif %}</span>
+        {%- render 'icon', name: 'chevron-down', size: 16 -%}
+      </button>
+
+      <div class="mg-facet__panel" {% unless open %}hidden{% endunless %}>
+        {%- case filter.type -%}
+          {%- when 'price_range' -%}
+            <div class="mg-facet__price">
+              <label class="mg-facet__price-field">
+                <span class="visually-hidden">{{ 'collection.filters.price_from' | t | default: 'From' }}</span>
+                <input type="number" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value }}" placeholder="{{ 0 | money_without_currency }}" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}" data-mg-price inputmode="decimal">
+              </label>
+              <span class="mg-facet__price-sep">–</span>
+              <label class="mg-facet__price-field">
+                <span class="visually-hidden">{{ 'collection.filters.price_to' | t | default: 'To' }}</span>
+                <input type="number" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value }}" placeholder="{{ filter.range_max | money_without_currency }}" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}" data-mg-price inputmode="decimal">
+              </label>
+            </div>
+
+          {%- else -%}
+            <ul class="mg-facet__list" role="list">
+              {%- for value in filter.values -%}
+                <li class="mg-facet__item">
+                  <label class="mg-facet__label {% if value.count == 0 and value.active == false %}is-disabled{% endif %}">
+                    <input
+                      type="checkbox"
+                      class="mg-facet__checkbox"
+                      name="{{ filter.param_name }}"
+                      value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {%- if filter.presentation == 'swatch' and value.swatch -%}
+                      <span class="mg-facet__swatch" style="{% if value.swatch.image %}background-image:url({{ value.swatch.image | image_url: width: 40 }});{% elsif value.swatch.color %}background-color:{{ value.swatch.color }};{% endif %}" aria-hidden="true"></span>
+                    {%- endif -%}
+                    <span class="mg-facet__name">{{ value.label | escape }}</span>
+                    <span class="mg-facet__count">{{ value.count }}</span>
+                  </label>
+                </li>
+              {%- endfor -%}
+            </ul>
+        {%- endcase -%}
+      </div>
+    </div>
+  {%- endfor -%}
+
+  <div class="mg-facets__foot">
+    <noscript><button class="mg-btn mg-btn--primary" type="submit">{{ 'collection.filters.apply' | t | default: 'Apply' }}</button></noscript>
+    <button class="mg-btn mg-btn--primary mg-facets__apply" type="button" data-mg-filter-close>{{ 'collection.filters.show_results' | t | default: 'Show results' }}</button>
+  </div>
+</form>

@@ -22,11 +22,48 @@
       "aria": "Breadcrumb",
       "home": "Home",
       "search": "Search"
+    },
+    "pagination": {
+      "aria": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page"
+    }
+  },
+  "collection": {
+    "toolbar": {
+      "products": "products",
+      "filter": "Filter",
+      "sort": "Sort by",
+      "view": "View"
+    },
+    "load_more": "Load more",
+    "showing": "Showing",
+    "filters": {
+      "title": "Filter",
+      "apply": "Apply",
+      "show_results": "Show results",
+      "price_from": "From",
+      "price_to": "To"
+    },
+    "empty": {
+      "title": "No products found",
+      "clear": "Clear all"
     }
   },
   "localization": {
     "country_label": "Country/region",
     "language_label": "Language"
+  },
+  "products": {
+    "price": {
+      "from": "From"
+    },
+    "card": {
+      "add_wishlist": "Add to wishlist",
+      "quick_view": "Quick view",
+      "out_of_5": "out of 5 stars"
+    }
   },
   "sections": {
     "announcement_bar": {

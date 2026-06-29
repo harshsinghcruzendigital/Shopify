@@ -11,7 +11,28 @@
         "show_description": true,
         "overlay_opacity": 35
       }
+    },
+    "collection-story": {
+      "type": "collection-story",
+      "settings": {
+        "layout": "image-right",
+        "eyebrow": "Our Story",
+        "heading": "Crafted with intention",
+        "image_ratio": "4/5"
+      }
+    },
+    "product-grid": {
+      "type": "main-collection",
+      "settings": {
+        "columns_desktop": 4,
+        "columns_tablet": 3,
+        "columns_mobile": 2,
+        "pagination_type": "load_more",
+        "show_sort": true,
+        "show_grid_toggle": true,
+        "show_filters": true
+      }
     }
   },
-  "order": ["collection-hero"]
+  "order": ["collection-hero", "collection-story", "product-grid"]
 }

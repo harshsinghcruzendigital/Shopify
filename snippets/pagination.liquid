@@ -1,0 +1,29 @@
+{%- comment -%}
+  pagination.liquid — reusable numbered pagination.
+  Param: paginate (a paginate object), anchor (optional #id appended to links)
+{%- endcomment -%}
+{%- if paginate.pages > 1 -%}
+  <nav class="mg-pagination" aria-label="{{ 'general.pagination.aria' | t | default: 'Pagination' }}">
+    <ul class="mg-pagination__list">
+      {%- if paginate.previous -%}
+        <li><a class="mg-pagination__link mg-pagination__link--arrow" href="{{ paginate.previous.url }}{{ anchor }}" aria-label="{{ 'general.pagination.previous' | t | default: 'Previous' }}">{%- render 'icon', name: 'chevron-left', size: 16 -%}</a></li>
+      {%- endif -%}
+
+      {%- for part in paginate.parts -%}
+        <li>
+          {%- if part.is_link -%}
+            <a class="mg-pagination__link" href="{{ part.url }}{{ anchor }}" aria-label="{{ 'general.pagination.page' | t | default: 'Page' }} {{ part.title }}">{{ part.title }}</a>
+          {%- elsif part.title == paginate.current_page -%}
+            <span class="mg-pagination__link is-current" aria-current="page">{{ part.title }}</span>
+          {%- else -%}
+            <span class="mg-pagination__ellipsis">{{ part.title }}</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+
+      {%- if paginate.next -%}
+        <li><a class="mg-pagination__link mg-pagination__link--arrow" href="{{ paginate.next.url }}{{ anchor }}" aria-label="{{ 'general.pagination.next' | t | default: 'Next' }}">{%- render 'icon', name: 'chevron-right', size: 16 -%}</a></li>
+      {%- endif -%}
+    </ul>
+  </nav>
+{%- endif -%}

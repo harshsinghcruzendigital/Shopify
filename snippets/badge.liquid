@@ -1,0 +1,24 @@
+{%- comment -%}
+  badge.liquid — reusable product/status badge (Design System §11).
+  Params:
+    type  (required) sale | new | best-seller | limited | exclusive |
+                     sold-out | low-stock | luxury | editor
+    text  (optional) label override; falls back to a sensible default
+{%- endcomment -%}
+{%- liquid
+  case type
+    when 'sale'        assign label = text | default: 'Sale'
+    when 'new'         assign label = text | default: 'New'
+    when 'best-seller' assign label = text | default: 'Best Seller'
+    when 'limited'     assign label = text | default: 'Limited Edition'
+    when 'exclusive'   assign label = text | default: 'Exclusive'
+    when 'sold-out'    assign label = text | default: 'Sold Out'
+    when 'low-stock'   assign label = text | default: 'Low Stock'
+    when 'luxury'      assign label = text | default: 'Luxury Pick'
+    when 'editor'      assign label = text | default: "Editor's Choice"
+    else               assign label = text
+  endcase
+-%}
+{%- if label != blank -%}
+  <span class="mg-badge mg-badge--{{ type }}">{{ label }}</span>
+{%- endif -%}

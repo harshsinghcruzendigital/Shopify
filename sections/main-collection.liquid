@@ -1,0 +1,496 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Collection Page · Components 03-05 engine
+  main-collection.liquid — toolbar (count, sort, grid toggle, mobile
+  filter button) + responsive product grid (2-5 cols) + pagination
+  (numbered / load-more / infinite scroll). Native {% paginate %} and
+  collection sorting. Filters (Layer 3) slot into the [data-mg-filters]
+  region without restructuring this section.
+  Custom element: <mg-collection>
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign per_page = section.settings.products_per_page
+  assign cols = section.settings.columns_desktop
+  assign cols_tablet = section.settings.columns_tablet
+  assign cols_mobile = section.settings.columns_mobile
+  assign pagination_type = section.settings.pagination_type
+  assign has_filters = false
+  if section.settings.show_filters and collection.filters.size > 0
+    assign has_filters = true
+  endif
+-%}
+
+<section
+  class="mg-collection mg-section {% if has_filters %}has-sidebar{% endif %} {{ section.settings.custom_class }}"
+  id="main-collection"
+  data-pagination="{{ pagination_type }}"
+  style="
+    --mg-cols: {{ cols }};
+    --mg-cols-tablet: {{ cols_tablet }};
+    --mg-cols-mobile: {{ cols_mobile }};
+    --mg-grid-gap: {{ section.settings.grid_gap }}px;
+  "
+>
+  <mg-collection class="mg-collection__wrap mg-container">
+
+    {%- comment -%} ---------- Toolbar (Component 04) ---------- {%- endcomment -%}
+    <div class="mg-collection__toolbar">
+      <p class="mg-collection__count" aria-live="polite">
+        <span data-mg-total>{{ collection.products_count }}</span>
+        <span class="mg-collection__count-suffix">{{ 'collection.toolbar.products' | t | default: 'products' }}</span>
+      </p>
+
+      <div class="mg-collection__toolbar-right">
+        {%- if section.settings.show_filter_button -%}
+          <button class="mg-collection__filter-btn" type="button" data-mg-filter-open aria-expanded="false" aria-controls="mg-filters">
+            {%- render 'icon', name: 'tag', size: 18 -%}
+            <span>{{ 'collection.toolbar.filter' | t | default: 'Filter' }}</span>
+          </button>
+        {%- endif -%}
+
+        {%- comment -%} Sort (native form; auto-submits via JS, works without) {%- endcomment -%}
+        {%- if section.settings.show_sort -%}
+          <form class="mg-collection__sort" method="get" data-mg-sort-form>
+            <label class="visually-hidden" for="mg-sort-by">{{ 'collection.toolbar.sort' | t | default: 'Sort by' }}</label>
+            <select class="mg-collection__sort-select" id="mg-sort-by" name="sort_by" data-mg-sort>
+              {%- assign current_sort = collection.sort_by | default: collection.default_sort_by -%}
+              {%- for option in collection.sort_options -%}
+                <option value="{{ option.value }}" {% if option.value == current_sort %}selected{% endif %}>{{ option.name }}</option>
+              {%- endfor -%}
+            </select>
+            {%- render 'icon', name: 'chevron-down', size: 14 -%}
+            <noscript><button type="submit">{{ 'collection.toolbar.sort' | t | default: 'Sort' }}</button></noscript>
+          </form>
+        {%- endif -%}
+
+        {%- if section.settings.show_grid_toggle -%}
+          <div class="mg-collection__view" role="group" aria-label="{{ 'collection.toolbar.view' | t | default: 'View' }}">
+            <button class="mg-collection__view-btn is-active" type="button" data-mg-cols="{{ cols }}" aria-label="Grid">
+              <span class="mg-collection__view-grid" aria-hidden="true"></span>
+            </button>
+            <button class="mg-collection__view-btn" type="button" data-mg-cols="{{ cols | minus: 1 }}" aria-label="Larger grid">
+              <span class="mg-collection__view-grid mg-collection__view-grid--wide" aria-hidden="true"></span>
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="mg-collection__layout">
+      {%- comment -%} Filters: sidebar on desktop, drawer on mobile {%- endcomment -%}
+      {%- if has_filters -%}
+        <div class="mg-collection__filter-overlay" data-mg-filter-close hidden></div>
+        <aside class="mg-collection__filters" id="mg-filters" data-mg-filters>
+          {%- render 'facets', results: collection -%}
+        </aside>
+      {%- endif -%}
+
+      <div class="mg-collection__main">
+        {%- paginate collection.products by per_page -%}
+          {%- if collection.products.size > 0 -%}
+            <ul class="mg-collection__grid" data-mg-grid role="list">
+              {%- for product in collection.products -%}
+                {%- liquid
+                  assign card_loading = 'lazy'
+                  if forloop.index <= cols
+                    assign card_loading = 'eager'
+                  endif
+                -%}
+                <li class="mg-collection__item" data-mg-grid-item>
+                  {%- render 'product-card',
+                    product: product,
+                    image_ratio: section.settings.card_image_ratio,
+                    loading: card_loading,
+                    show_vendor: section.settings.show_vendor,
+                    show_rating: section.settings.show_rating,
+                    show_swatches: section.settings.show_swatches,
+                    show_quick_view: section.settings.show_quick_view,
+                    sizes: '(min-width: 990px) calc(100vw / 4), (min-width: 768px) 33vw, 50vw'
+                  -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+
+            {%- comment -%} ---------- Pagination ---------- {%- endcomment -%}
+            {%- if pagination_type == 'paginate' -%}
+              {%- render 'pagination', paginate: paginate, anchor: '#main-collection' -%}
+            {%- elsif paginate.next -%}
+              <div class="mg-collection__more">
+                {%- if pagination_type == 'infinite' -%}
+                  <div class="mg-collection__sentinel" data-mg-infinite data-next-url="{{ paginate.next.url }}" aria-hidden="true"></div>
+                {%- endif -%}
+                <button class="mg-btn mg-btn--outline mg-collection__load-more" type="button" data-mg-load-more data-next-url="{{ paginate.next.url }}">
+                  {{ 'collection.load_more' | t | default: 'Load more' }}
+                </button>
+                <p class="mg-collection__progress">
+                  {{ 'collection.showing' | t | default: 'Showing' }}
+                  <span data-mg-shown>{{ collection.products.size }}</span> / {{ collection.products_count }}
+                </p>
+              </div>
+            {%- endif -%}
+
+          {%- else -%}
+            <div class="mg-collection__empty">
+              <p class="mg-collection__empty-title">{{ 'collection.empty.title' | t | default: 'No products found' }}</p>
+              {%- if collection.current_tags or current_tags -%}
+                <a class="mg-btn mg-btn--outline" href="{{ collection.url }}">{{ 'collection.empty.clear' | t | default: 'Clear filters' }}</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+    </div>
+  </mg-collection>
+</section>
+
+{% stylesheet %}
+.mg-collection { background: var(--mg-bg-page); }
+
+/* Toolbar */
+.mg-collection__toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--mg-space-4); padding-block: var(--mg-space-5); border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); margin-bottom: var(--mg-space-8); flex-wrap: wrap; }
+.mg-collection__count { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-text-secondary); margin: 0; }
+.mg-collection__toolbar-right { display: flex; align-items: center; gap: var(--mg-space-5); }
+
+.mg-collection__filter-btn { display: inline-flex; align-items: center; gap: var(--mg-space-2); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-navy); }
+.mg-collection__filter-btn:hover { color: var(--mg-gold); }
+
+.mg-collection__sort { position: relative; display: inline-flex; align-items: center; }
+.mg-collection__sort-select { appearance: none; -webkit-appearance: none; padding: var(--mg-space-2) var(--mg-space-6) var(--mg-space-2) var(--mg-space-2); background: transparent; border: 0; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-navy); cursor: pointer; }
+.mg-collection__sort svg { position: absolute; right: 0; pointer-events: none; }
+
+.mg-collection__view { display: inline-flex; gap: var(--mg-space-1); }
+.mg-collection__view-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: var(--mg-text-muted); }
+.mg-collection__view-btn.is-active { color: var(--mg-navy); }
+.mg-collection__view-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 16px; height: 16px; }
+.mg-collection__view-grid::before, .mg-collection__view-grid::after { content: ""; }
+.mg-collection__view-grid { background:
+  linear-gradient(currentColor 0 0) 0 0 / 4px 4px no-repeat,
+  linear-gradient(currentColor 0 0) 6px 0 / 4px 4px no-repeat,
+  linear-gradient(currentColor 0 0) 12px 0 / 4px 4px no-repeat,
+  linear-gradient(currentColor 0 0) 0 6px / 4px 4px no-repeat,
+  linear-gradient(currentColor 0 0) 6px 6px / 4px 4px no-repeat,
+  linear-gradient(currentColor 0 0) 12px 6px / 4px 4px no-repeat; }
+.mg-collection__view-grid--wide { background:
+  linear-gradient(currentColor 0 0) 0 0 / 7px 7px no-repeat,
+  linear-gradient(currentColor 0 0) 9px 0 / 7px 7px no-repeat,
+  linear-gradient(currentColor 0 0) 0 9px / 7px 7px no-repeat,
+  linear-gradient(currentColor 0 0) 9px 9px / 7px 7px no-repeat; }
+
+/* Layout (filters sidebar + main) */
+.mg-collection__layout { display: block; }
+.mg-collection.has-sidebar .mg-collection__layout { display: grid; grid-template-columns: 260px 1fr; gap: var(--mg-space-9); }
+
+/* Grid */
+.mg-collection__grid { display: grid; grid-template-columns: repeat(var(--mg-cols, 4), minmax(0, 1fr)); gap: var(--mg-grid-gap, 24px) var(--mg-grid-gap, 24px); list-style: none; margin: 0; padding: 0; }
+.mg-collection__item { min-width: 0; }
+
+/* Load more / progress */
+.mg-collection__more { display: flex; flex-direction: column; align-items: center; gap: var(--mg-space-4); margin-top: var(--mg-space-10); }
+.mg-collection__progress { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-text-muted); }
+.mg-collection__sentinel { width: 100%; height: 1px; }
+.mg-collection__load-more.is-loading { opacity: var(--mg-opacity-muted); pointer-events: none; }
+
+/* Pagination */
+.mg-pagination { margin-top: var(--mg-space-10); }
+.mg-pagination__list { display: flex; justify-content: center; align-items: center; gap: var(--mg-space-2); }
+.mg-pagination__link { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 var(--mg-space-2); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); color: var(--mg-text-secondary); border-bottom: var(--mg-border-thick) solid transparent; }
+.mg-pagination__link:hover { color: var(--mg-gold); }
+.mg-pagination__link.is-current { color: var(--mg-navy); border-bottom-color: var(--mg-gold); }
+.mg-pagination__ellipsis { padding: 0 var(--mg-space-1); color: var(--mg-text-muted); }
+
+/* Empty */
+.mg-collection__empty { text-align: center; padding-block: var(--mg-space-12); display: flex; flex-direction: column; align-items: center; gap: var(--mg-space-5); }
+.mg-collection__empty-title { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); color: var(--mg-text-secondary); }
+
+@media (max-width: 989px) {
+  .mg-collection__grid { grid-template-columns: repeat(var(--mg-cols-tablet, 3), minmax(0, 1fr)); }
+  .mg-collection.has-sidebar .mg-collection__layout { grid-template-columns: 1fr; }
+  .mg-collection__view { display: none; }
+}
+@media (max-width: 767px) {
+  .mg-collection__grid { grid-template-columns: repeat(var(--mg-cols-mobile, 2), minmax(0, 1fr)); gap: var(--mg-space-4); }
+  .mg-collection__toolbar { gap: var(--mg-space-3); }
+}
+
+/* Loading state during AJAX filter/sort */
+.mg-collection.is-filtering .mg-collection__main { opacity: var(--mg-opacity-muted); pointer-events: none; transition: opacity var(--mg-dur-base) var(--mg-ease); }
+
+/* ---------- Facets ---------- */
+.mg-facets__head { display: none; }
+.mg-facets__active { display: flex; flex-wrap: wrap; align-items: center; gap: var(--mg-space-2); margin-bottom: var(--mg-space-5); }
+.mg-facets__chip { display: inline-flex; align-items: center; gap: var(--mg-space-1); padding: var(--mg-space-1) var(--mg-space-3); background: var(--mg-gray-soft); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); border-radius: var(--mg-radius-pill); color: var(--mg-navy); }
+.mg-facets__chip:hover { background: var(--mg-beige); color: var(--mg-navy); }
+.mg-facets__clear { font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-gold); text-decoration: underline; text-underline-offset: 3px; }
+
+.mg-facet { border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+.mg-facet__toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: var(--mg-space-4) 0; font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-nav); font-weight: 500; letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-navy); }
+.mg-facet__toggle svg { transition: transform var(--mg-dur-base) var(--mg-ease); }
+.mg-facet__toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.mg-facet__panel { padding-bottom: var(--mg-space-5); }
+.mg-facet__list { display: flex; flex-direction: column; gap: var(--mg-space-2); max-height: 280px; overflow-y: auto; }
+.mg-facet__label { display: flex; align-items: center; gap: var(--mg-space-3); cursor: pointer; font-size: var(--mg-fs-body-sm); color: var(--mg-text); }
+.mg-facet__label.is-disabled { opacity: var(--mg-opacity-disabled); cursor: not-allowed; }
+.mg-facet__checkbox { width: 18px; height: 18px; accent-color: var(--mg-navy); flex: 0 0 auto; }
+.mg-facet__swatch { width: 18px; height: 18px; border-radius: var(--mg-radius-pill); border: var(--mg-border-hairline) solid var(--mg-border-divider); background-size: cover; background-position: center; flex: 0 0 auto; }
+.mg-facet__name { flex: 1 1 auto; }
+.mg-facet__count { color: var(--mg-text-muted); font-size: var(--mg-fs-caption); }
+.mg-facet__price { display: flex; align-items: center; gap: var(--mg-space-3); }
+.mg-facet__price-field { flex: 1; }
+.mg-facet__price input { width: 100%; height: 44px; padding: 0 var(--mg-space-3); border: var(--mg-border-hairline) solid var(--mg-border-input); border-radius: var(--mg-radius-xs); background: var(--mg-white); }
+.mg-facet__price input:focus { border-color: var(--mg-gold); outline: none; }
+.mg-facets__foot { margin-top: var(--mg-space-5); }
+.mg-facets__apply { display: none; width: 100%; }
+
+/* Desktop: filters are a static sidebar */
+@media (min-width: 990px) {
+  .mg-collection__filter-overlay { display: none; }
+}
+
+/* Mobile/tablet: filters become a slide-in drawer */
+@media (max-width: 989px) {
+  .mg-collection__filters {
+    position: fixed; top: 0; bottom: 0; left: 0;
+    width: min(420px, 88vw);
+    z-index: var(--mg-z-drawer);
+    background: var(--mg-bg-card);
+    padding: var(--mg-space-5);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform var(--mg-dur-base) var(--mg-ease);
+    box-shadow: var(--mg-shadow-lg);
+  }
+  .mg-collection.filters-open .mg-collection__filters { transform: translateX(0); }
+  .mg-collection__filter-overlay { position: fixed; inset: 0; z-index: var(--mg-z-overlay); background: var(--mg-overlay); }
+  .mg-facets__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--mg-space-5); padding-bottom: var(--mg-space-4); border-bottom: var(--mg-border-hairline) solid var(--mg-border-divider); }
+  .mg-facets__title { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); }
+  .mg-facets__apply { display: inline-flex; }
+}
+{% endstyle %}
+
+{% javascript %}
+class MGCollection extends HTMLElement {
+  connectedCallback() {
+    this.section = this.closest('.mg-collection');
+    this.main = () => this.querySelector('.mg-collection__main');
+    this.grid = () => this.querySelector('[data-mg-grid]');
+
+    this._debouncedPrice = (window.MG ? MG.utils.debounce : (f) => f)(() => this.applyFilters(), 600);
+
+    // Delegated listeners survive AJAX innerHTML swaps.
+    this.addEventListener('change', this._onChange.bind(this));
+    this.addEventListener('input', this._onInput.bind(this));
+    this.addEventListener('click', this._onClick.bind(this));
+
+    this._restoreCols();
+    this._observeInfinite();
+
+    this._onPop = () => this.applyFilters(window.location.href, { push: false, scroll: false });
+    window.addEventListener('popstate', this._onPop);
+  }
+
+  disconnectedCallback() {
+    if (this._io) this._io.disconnect();
+    window.removeEventListener('popstate', this._onPop);
+  }
+
+  /* ---------- Event delegation ---------- */
+  _onChange(e) {
+    if (e.target.closest('[data-mg-sort]')) return this.applyFilters();
+    if (e.target.matches('.mg-facet__checkbox')) return this.applyFilters();
+  }
+  _onInput(e) {
+    if (e.target.matches('[data-mg-price]')) this._debouncedPrice();
+  }
+  _onClick(e) {
+    const cols = e.target.closest('[data-mg-cols]');
+    if (cols) return this._setCols(cols.dataset.cols);
+
+    if (e.target.closest('[data-mg-load-more]')) { e.preventDefault(); return this._loadNext(); }
+    if (e.target.closest('[data-mg-filter-open]')) return this._openDrawer();
+    if (e.target.closest('[data-mg-filter-close]')) return this._closeDrawer();
+
+    const toggle = e.target.closest('[data-mg-facet-toggle]');
+    if (toggle) return this._toggleFacet(toggle);
+
+    const link = e.target.closest('[data-mg-chip], [data-mg-clear]');
+    if (link) { e.preventDefault(); return this.applyFilters(link.href); }
+  }
+
+  /* ---------- Grid density toggle ---------- */
+  _restoreCols() {
+    let stored = null;
+    try { stored = localStorage.getItem('mg-grid-cols'); } catch (e) {}
+    if (stored) this._setCols(stored);
+  }
+  _setCols(cols) {
+    if (!this.section) return;
+    this.section.style.setProperty('--mg-cols', cols);
+    this.querySelectorAll('[data-mg-cols]').forEach((b) => b.classList.toggle('is-active', b.dataset.cols === cols));
+    try { localStorage.setItem('mg-grid-cols', cols); } catch (e) {}
+  }
+
+  /* ---------- Accordion ---------- */
+  _toggleFacet(btn) {
+    const panel = btn.nextElementSibling;
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    if (panel) panel.hidden = open;
+  }
+
+  /* ---------- Mobile drawer ---------- */
+  _openDrawer() {
+    this.section?.classList.add('filters-open');
+    const overlay = this.querySelector('.mg-collection__filter-overlay');
+    if (overlay) overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    this.querySelector('[data-mg-filter-open]')?.setAttribute('aria-expanded', 'true');
+  }
+  _closeDrawer() {
+    this.section?.classList.remove('filters-open');
+    const overlay = this.querySelector('.mg-collection__filter-overlay');
+    if (overlay) overlay.hidden = true;
+    document.body.style.overflow = '';
+    this.querySelector('[data-mg-filter-open]')?.setAttribute('aria-expanded', 'false');
+  }
+
+  /* ---------- Build URL from filter form + sort ---------- */
+  _buildUrl() {
+    const params = new URLSearchParams();
+    const form = this.querySelector('[data-mg-filter-form]');
+    if (form) {
+      new FormData(form).forEach((value, key) => {
+        if (value !== '' && key !== 'sort_by') params.append(key, value);
+      });
+    }
+    const sort = this.querySelector('[data-mg-sort]');
+    if (sort && sort.value) params.set('sort_by', sort.value);
+    const qs = params.toString();
+    return window.location.pathname + (qs ? '?' + qs : '');
+  }
+
+  /* ---------- AJAX apply filters/sort ---------- */
+  async applyFilters(url, opts) {
+    opts = opts || {};
+    const target = url || this._buildUrl();
+    if (this._reqController) this._reqController.abort();
+    this._reqController = new AbortController();
+    this.section?.classList.add('is-filtering');
+    try {
+      const res = await fetch(target, { signal: this._reqController.signal });
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+
+      const newMain = doc.querySelector('.mg-collection__main');
+      const newFilters = doc.querySelector('[data-mg-filters]');
+      const newCount = doc.querySelector('[data-mg-total]');
+      if (newMain) this.main().innerHTML = newMain.innerHTML;
+      if (newFilters && this.querySelector('[data-mg-filters]')) this.querySelector('[data-mg-filters]').innerHTML = newFilters.innerHTML;
+      if (newCount) { const c = this.querySelector('[data-mg-total]'); if (c) c.textContent = newCount.textContent; }
+
+      if (opts.push !== false) history.pushState({}, '', target);
+      this._observeInfinite();
+      if (opts.scroll !== false) this.section.scrollIntoView({ behavior: MG && MG.utils.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      if (window.MG && MG.events) MG.events.emit('products:appended', { grid: this.grid() });
+    } catch (e) {
+      if (e.name !== 'AbortError') window.location.assign(target); // graceful fallback
+    } finally {
+      this.section?.classList.remove('is-filtering');
+    }
+  }
+
+  /* ---------- Load more / infinite ---------- */
+  _observeInfinite() {
+    if (this._io) this._io.disconnect();
+    const sentinel = this.querySelector('[data-mg-infinite]');
+    if (sentinel && 'IntersectionObserver' in window) {
+      this._io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting && !this._loading) this._loadNext(); });
+      }, { rootMargin: '600px 0px' });
+      this._io.observe(sentinel);
+    }
+  }
+
+  async _loadNext() {
+    const btn = this.querySelector('[data-mg-load-more]');
+    const url = btn && btn.dataset.nextUrl;
+    if (!url || this._loading) return;
+    this._loading = true;
+    btn.classList.add('is-loading');
+    try {
+      const res = await fetch(url);
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+      const grid = this.grid();
+      doc.querySelectorAll('[data-mg-grid] > [data-mg-grid-item]').forEach((item) => grid.appendChild(document.importNode(item, true)));
+
+      const nextBtn = doc.querySelector('[data-mg-load-more]');
+      if (nextBtn && nextBtn.dataset.nextUrl) {
+        btn.dataset.nextUrl = nextBtn.dataset.nextUrl;
+        const newSentinel = doc.querySelector('[data-mg-infinite]');
+        const sentinel = this.querySelector('[data-mg-infinite]');
+        if (sentinel && newSentinel) sentinel.dataset.nextUrl = newSentinel.dataset.nextUrl;
+      } else {
+        btn.closest('.mg-collection__more')?.remove();
+        if (this._io) this._io.disconnect();
+      }
+      const shown = this.querySelector('[data-mg-shown]');
+      if (shown) shown.textContent = grid.querySelectorAll('[data-mg-grid-item]').length;
+      if (window.MG && MG.events) MG.events.emit('products:appended', { grid });
+    } catch (e) {
+      /* keep button for retry */
+    } finally {
+      this._loading = false;
+      this.querySelector('[data-mg-load-more]')?.classList.remove('is-loading');
+    }
+  }
+}
+if (!customElements.get('mg-collection')) customElements.define('mg-collection', MGCollection);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Product grid",
+  "tag": "section",
+  "class": "mg-collection-main",
+  "settings": [
+    { "type": "header", "content": "Grid" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 5, "step": 1, "label": "Columns (desktop)", "default": 4 },
+    { "type": "range", "id": "columns_tablet", "min": 2, "max": 4, "step": 1, "label": "Columns (tablet)", "default": 3 },
+    { "type": "range", "id": "columns_mobile", "min": 1, "max": 2, "step": 1, "label": "Columns (mobile)", "default": 2 },
+    { "type": "range", "id": "grid_gap", "min": 8, "max": 48, "step": 2, "unit": "px", "label": "Grid gap", "default": 24 },
+    { "type": "range", "id": "products_per_page", "min": 8, "max": 48, "step": 4, "label": "Products per page", "default": 24 },
+    {
+      "type": "select", "id": "card_image_ratio", "label": "Card image ratio",
+      "options": [ { "value": "3/4", "label": "Portrait (3:4)" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "1/1", "label": "Square" } ],
+      "default": "3/4"
+    },
+
+    { "type": "header", "content": "Pagination" },
+    {
+      "type": "select", "id": "pagination_type", "label": "Pagination type",
+      "options": [ { "value": "paginate", "label": "Numbered pages" }, { "value": "load_more", "label": "Load more button" }, { "value": "infinite", "label": "Infinite scroll" } ],
+      "default": "load_more"
+    },
+
+    { "type": "header", "content": "Toolbar" },
+    { "type": "checkbox", "id": "show_sort", "label": "Show sort", "default": true },
+    { "type": "checkbox", "id": "show_grid_toggle", "label": "Show grid toggle", "default": true },
+    { "type": "checkbox", "id": "show_filter_button", "label": "Show filter button", "default": true },
+
+    { "type": "header", "content": "Filters" },
+    { "type": "checkbox", "id": "show_filters", "label": "Show filters (sidebar)", "default": true, "info": "Filter UI is added in the next build layer" },
+
+    { "type": "header", "content": "Product card" },
+    { "type": "checkbox", "id": "show_vendor", "label": "Show vendor", "default": false },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "checkbox", "id": "show_swatches", "label": "Show color swatches", "default": true },
+    { "type": "checkbox", "id": "show_quick_view", "label": "Show quick view", "default": true },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "enabled_on": { "templates": ["collection"] }
+}
+{% endschema %}

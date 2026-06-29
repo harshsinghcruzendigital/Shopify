@@ -1,0 +1,140 @@
+{%- comment -%}
+  product-card.liquid — the central luxury product card. Reused by the
+  collection grid, related/recently-viewed, featured collection and the
+  homepage product showcase.
+  Params:
+    product       (required) product object
+    image_ratio   (optional) default '3/4'
+    sizes         (optional) responsive sizes attr
+    loading       (optional) 'lazy' (default) | 'eager'
+    show_vendor   (optional, default false)
+    show_rating   (optional, default true)
+    show_swatches (optional, default true)
+    show_wishlist (optional, default true)
+    show_quick_view (optional, default true)
+  Wishlist & quick-view are buttons that emit MG.events; Part 4
+  Components 6-7 enhance them. Card links remain the working fallback.
+{%- endcomment -%}
+{%- liquid
+  assign ratio = image_ratio | default: '3/4'
+  assign img_sizes = sizes | default: '(min-width: 990px) 25vw, (min-width: 768px) 33vw, 50vw'
+  assign img_loading = loading | default: 'lazy'
+  assign show_rating = show_rating | default: true, allow_false: true
+  assign show_swatches = show_swatches | default: true, allow_false: true
+  assign show_wishlist = show_wishlist | default: true, allow_false: true
+  assign show_quick_view = show_quick_view | default: true, allow_false: true
+
+  assign second_image = product.media[1].preview_image
+
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  comment
+    Tag-driven badges (lowercased compare). Sale & sold-out are automatic.
+  endcomment
+  assign tags_down = product.tags | join: ',' | downcase
+-%}
+
+{%- if product and product != empty -%}
+  <article class="mg-product-card" data-mg-product-card data-product-id="{{ product.id }}">
+    <div class="mg-product-card__media">
+      <a class="mg-product-card__media-link" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+        {%- if product.featured_media -%}
+          {%- render 'responsive-image', image: product.featured_media.preview_image, sizes: img_sizes, class: 'mg-product-card__img mg-product-card__img--primary', loading: img_loading, aspect_ratio: ratio -%}
+        {%- else -%}
+          <div class="mg-image-placeholder" style="aspect-ratio: {{ ratio }};">{{ 'product-1' | placeholder_svg_tag: 'mg-image-placeholder__svg' }}</div>
+        {%- endif -%}
+        {%- if second_image -%}
+          {%- render 'responsive-image', image: second_image, sizes: img_sizes, class: 'mg-product-card__img mg-product-card__img--secondary', loading: 'lazy', aspect_ratio: ratio -%}
+        {%- endif -%}
+      </a>
+
+      {%- comment -%} Badges {%- endcomment -%}
+      <div class="mg-product-card__badges">
+        {%- unless product.available -%}{%- render 'badge', type: 'sold-out' -%}
+        {%- else -%}
+          {%- if on_sale -%}{%- render 'badge', type: 'sale' -%}{%- endif -%}
+        {%- endunless -%}
+        {%- if tags_down contains 'new' -%}{%- render 'badge', type: 'new' -%}{%- endif -%}
+        {%- if tags_down contains 'best seller' or tags_down contains 'best-seller' -%}{%- render 'badge', type: 'best-seller' -%}{%- endif -%}
+        {%- if tags_down contains 'limited' -%}{%- render 'badge', type: 'limited' -%}{%- endif -%}
+        {%- if tags_down contains 'exclusive' -%}{%- render 'badge', type: 'exclusive' -%}{%- endif -%}
+      </div>
+
+      {%- if show_wishlist -%}
+        <button class="mg-product-card__wishlist" type="button" aria-label="{{ 'products.card.add_wishlist' | t | default: 'Add to wishlist' }}" data-mg-wishlist-toggle data-product-handle="{{ product.handle }}" data-product-id="{{ product.id }}">
+          {%- render 'icon', name: 'heart', size: 20 -%}
+        </button>
+      {%- endif -%}
+
+      {%- if show_quick_view -%}
+        <button class="mg-product-card__quick-view" type="button" data-mg-quick-view data-product-handle="{{ product.handle }}">
+          {{ 'products.card.quick_view' | t | default: 'Quick view' }}
+        </button>
+      {%- endif -%}
+    </div>
+
+    <div class="mg-product-card__info">
+      {%- if show_vendor and product.vendor != blank -%}
+        <p class="mg-product-card__vendor">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+
+      <h3 class="mg-product-card__title">
+        <a class="mg-product-card__title-link" href="{{ product.url }}">{{ product.title | escape }}</a>
+      </h3>
+
+      {%- if show_rating and product.metafields.reviews.rating.value != blank -%}
+        {%- liquid
+          assign rating = product.metafields.reviews.rating.value
+          assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+          assign rounded = rating.rating | round
+        -%}
+        <div class="mg-product-card__rating" role="img" aria-label="{{ rating.rating }} {{ 'products.card.out_of_5' | t | default: 'out of 5 stars' }}">
+          <span class="mg-product-card__stars" aria-hidden="true">
+            {%- for i in (1..5) -%}{%- if i <= rounded -%}★{%- else -%}☆{%- endif -%}{%- endfor -%}
+          </span>
+          {%- if rating_count > 0 -%}<span class="mg-product-card__rating-count">({{ rating_count }})</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- render 'price', product: product, class: 'mg-product-card__price' -%}
+
+      {%- if show_swatches -%}
+        {%- liquid
+          assign swatch_option = null
+          for opt in product.options_with_values
+            assign opt_down = opt.name | downcase
+            if opt_down contains 'color' or opt_down contains 'colour'
+              assign swatch_option = opt
+            endif
+          endfor
+        -%}
+        {%- if swatch_option -%}
+          <ul class="mg-product-card__swatches" aria-label="{{ swatch_option.name | escape }}">
+            {%- for value in swatch_option.values limit: 5 -%}
+              {%- liquid
+                assign swatch_style = ''
+                if value.swatch.image
+                  assign swatch_img = value.swatch.image | image_url: width: 40
+                  assign swatch_style = 'background-image: url(' | append: swatch_img | append: ');'
+                elsif value.swatch.color
+                  assign swatch_style = 'background-color: ' | append: value.swatch.color | append: ';'
+                else
+                  assign swatch_style = 'background-color: ' | append: value | downcase | append: ';'
+                endif
+              -%}
+              <li class="mg-product-card__swatch" title="{{ value | escape }}" style="{{ swatch_style }}">
+                <span class="visually-hidden">{{ value | escape }}</span>
+              </li>
+            {%- endfor -%}
+            {%- if swatch_option.values.size > 5 -%}
+              <li class="mg-product-card__swatch-more">+{{ swatch_option.values.size | minus: 5 }}</li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </article>
+{%- endif -%}

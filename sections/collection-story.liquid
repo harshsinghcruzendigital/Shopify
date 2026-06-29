@@ -1,0 +1,201 @@
+{%- comment -%}
+  ============================================================
+  Madrishi Global — Collection Page · Component 02: Collection Story
+  Editorial story block: lifestyle image OR video paired with rich
+  text, optional pull-quote and signature. Four layouts. Reusable on
+  any template. No section JS — uses shared scroll-reveal observer.
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign layout = section.settings.layout
+  assign has_media = false
+  if section.settings.image != blank or section.settings.video != blank
+    assign has_media = true
+  endif
+  if layout == 'text-only'
+    assign has_media = false
+  endif
+-%}
+
+<section
+  class="mg-story mg-story--{{ layout }} {{ section.settings.custom_class }}"
+  id="{{ section.settings.anchor_id | default: section.id }}"
+  style="
+    --mg-story-bg: {{ section.settings.background }};
+    --mg-story-text: {{ section.settings.text_color }};
+    --mg-story-pad-top: {{ section.settings.padding_top }}px;
+    --mg-story-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  {% if section.settings.animate %}data-mg-animate-section{% endif %}
+>
+  <div class="mg-story__container {% if section.settings.narrow %}mg-container mg-container--narrow{% else %}mg-container{% endif %}">
+    <div class="mg-story__grid">
+      {%- if has_media -%}
+        <div class="mg-story__media" data-mg-animate>
+          {%- if section.settings.video != blank -%}
+            {{ section.settings.video | video_tag: image_size: '1100x', loop: true, autoplay: false, muted: true, controls: true, class: 'mg-story__video' }}
+          {%- else -%}
+            {%- render 'responsive-image',
+              image: section.settings.image,
+              mobile: section.settings.image_mobile,
+              sizes: '(min-width: 990px) 50vw, 100vw',
+              class: 'mg-story__img',
+              aspect_ratio: section.settings.image_ratio
+            -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div class="mg-story__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="mg-story__eyebrow mg-eyebrow" data-mg-animate>{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="mg-story__heading" data-mg-animate>{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.body != blank -%}
+          <div class="mg-story__body rte" data-mg-animate>{{ section.settings.body }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.quote != blank -%}
+          <blockquote class="mg-story__quote" data-mg-animate>
+            <p class="mg-story__quote-text">{{ section.settings.quote | escape }}</p>
+            {%- if section.settings.quote_author != blank -%}
+              <cite class="mg-story__quote-author">{{ section.settings.quote_author | escape }}</cite>
+            {%- endif -%}
+          </blockquote>
+        {%- endif -%}
+
+        {%- if section.settings.button_text != blank -%}
+          <div class="mg-story__actions" data-mg-animate>
+            <a class="mg-btn mg-btn--{{ section.settings.button_style }}" href="{{ section.settings.button_link | default: '#' }}">{{ section.settings.button_text | escape }}</a>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.signature_image != blank -%}
+          <div class="mg-story__signature" data-mg-animate>
+            {%- render 'responsive-image', image: section.settings.signature_image, sizes: '200px', class: 'mg-story__signature-img', widths: '120,200,300,400' -%}
+          </div>
+        {%- elsif section.settings.signature_text != blank -%}
+          <p class="mg-story__signature mg-story__signature--text" data-mg-animate>{{ section.settings.signature_text | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.mg-story { background: var(--mg-story-bg, transparent); color: var(--mg-story-text, var(--mg-text)); padding-block: var(--mg-story-pad-top, var(--mg-section-spacing)) var(--mg-story-pad-bottom, var(--mg-section-spacing)); }
+.mg-story__grid { display: grid; gap: var(--mg-space-10); align-items: center; }
+
+/* Split layouts */
+@media (min-width: 990px) {
+  .mg-story--image-left .mg-story__grid,
+  .mg-story--image-right .mg-story__grid { grid-template-columns: 1fr 1fr; gap: var(--mg-space-12); }
+  .mg-story--image-right .mg-story__media { order: 2; }
+}
+
+/* Background layout: text over full image */
+.mg-story--image-background { position: relative; padding: 0; }
+.mg-story--image-background .mg-story__container { position: relative; z-index: 1; padding-block: var(--mg-space-13); }
+.mg-story--image-background .mg-story__media { position: absolute; inset: 0; z-index: 0; }
+.mg-story--image-background .mg-story__media .mg-picture,
+.mg-story--image-background .mg-story__img { width: 100%; height: 100%; object-fit: cover; }
+.mg-story--image-background .mg-story__grid { grid-template-columns: 1fr; }
+.mg-story--image-background .mg-story__content { max-width: 640px; margin-inline: auto; text-align: center; color: var(--mg-ivory); position: relative; }
+
+/* Text-only */
+.mg-story--text-only .mg-story__content { max-width: 760px; margin-inline: auto; text-align: center; }
+
+/* Media */
+.mg-story__media { overflow: hidden; }
+.mg-story__img, .mg-story__video { width: 100%; height: auto; display: block; }
+
+/* Content */
+.mg-story__eyebrow { margin-bottom: var(--mg-space-4); }
+.mg-story__heading { font-size: var(--mg-fs-section); font-weight: 300; line-height: var(--mg-lh-heading); margin-bottom: var(--mg-space-5); color: inherit; }
+.mg-story__body { font-size: var(--mg-fs-body-lg); line-height: var(--mg-lh-body); color: inherit; }
+.mg-story__body > * + * { margin-top: var(--mg-space-4); }
+
+.mg-story__quote { margin: var(--mg-space-8) 0 0; padding-left: var(--mg-space-5); border-left: var(--mg-border-thick) solid var(--mg-gold); }
+.mg-story--text-only .mg-story__quote,
+.mg-story--image-background .mg-story__quote { border-left: 0; padding-left: 0; }
+.mg-story__quote-text { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); font-style: italic; line-height: var(--mg-lh-snug); color: inherit; }
+.mg-story__quote-author { display: block; margin-top: var(--mg-space-3); font-family: var(--mg-font-eyebrow); font-size: var(--mg-fs-caption); letter-spacing: var(--mg-track-wide); text-transform: uppercase; color: var(--mg-gold); font-style: normal; }
+
+.mg-story__actions { margin-top: var(--mg-space-7); }
+.mg-story__signature { margin-top: var(--mg-space-7); }
+.mg-story__signature-img { width: auto; max-height: 64px; }
+.mg-story__signature--text { font-family: var(--mg-font-display); font-size: var(--mg-fs-card-heading); font-style: italic; color: inherit; }
+
+@media (max-width: 989px) {
+  .mg-story__grid { gap: var(--mg-space-8); }
+  .mg-story--image-background .mg-story__container { padding-block: var(--mg-space-11); }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Collection story",
+  "tag": "section",
+  "class": "mg-story-section",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select", "id": "layout", "label": "Layout",
+      "options": [
+        { "value": "image-left", "label": "Image left" },
+        { "value": "image-right", "label": "Image right" },
+        { "value": "image-background", "label": "Text over image" },
+        { "value": "text-only", "label": "Text only" }
+      ], "default": "image-right"
+    },
+    { "type": "checkbox", "id": "narrow", "label": "Narrow container", "default": false },
+
+    { "type": "header", "content": "Media" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image" },
+    { "type": "video", "id": "video", "label": "Video", "info": "Overrides image (not used in 'Text over image')" },
+    {
+      "type": "select", "id": "image_ratio", "label": "Image ratio",
+      "options": [
+        { "value": "4/5", "label": "Portrait (4:5)" },
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "1/1", "label": "Square" },
+        { "value": "16/9", "label": "Landscape (16:9)" }
+      ], "default": "4/5"
+    },
+
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Story" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Crafted with intention" },
+    { "type": "richtext", "id": "body", "label": "Body", "default": "<p>Every piece is the result of meticulous craftsmanship, designed to be treasured for a lifetime.</p>" },
+
+    { "type": "header", "content": "Pull quote (optional)" },
+    { "type": "text", "id": "quote", "label": "Quote" },
+    { "type": "text", "id": "quote_author", "label": "Quote author" },
+
+    { "type": "header", "content": "Signature (optional)" },
+    { "type": "image_picker", "id": "signature_image", "label": "Signature image" },
+    { "type": "text", "id": "signature_text", "label": "Signature text", "info": "Used if no signature image is set" },
+
+    { "type": "header", "content": "Button (optional)" },
+    { "type": "text", "id": "button_text", "label": "Label" },
+    { "type": "url", "id": "button_link", "label": "Link" },
+    { "type": "select", "id": "button_style", "label": "Style", "options": [ { "value": "primary", "label": "Primary" }, { "value": "secondary", "label": "Secondary" }, { "value": "outline", "label": "Outline" }, { "value": "text", "label": "Text link" } ], "default": "text" },
+
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#FBF8F2" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#1C1C1C" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 8, "unit": "px", "label": "Padding top", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 8, "unit": "px", "label": "Padding bottom", "default": 96 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "checkbox", "id": "animate", "label": "Animate on scroll", "default": true },
+    { "type": "text", "id": "anchor_id", "label": "Section anchor ID" },
+    { "type": "text", "id": "custom_class", "label": "Custom CSS class" }
+  ],
+  "presets": [ { "name": "Collection story" } ]
+}
+{% endschema %}

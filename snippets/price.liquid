@@ -1,0 +1,53 @@
+{%- comment -%}
+  price.liquid — reusable price display.
+  Params:
+    product        (optional) product object — handles ranged "From" pricing
+    variant        (optional) variant object — overrides product for a chosen variant
+    show_compare   (optional, default true) show compare-at strikethrough
+    show_unit      (optional, default true) show unit price (per measurement)
+    class          (optional) extra css class
+{%- endcomment -%}
+{%- liquid
+  assign show_compare = show_compare | default: true, allow_false: true
+  assign show_unit = show_unit | default: true, allow_false: true
+
+  if variant != blank
+    assign target_price = variant.price
+    assign target_compare = variant.compare_at_price
+    assign available = variant.available
+    assign on_sale = false
+    if variant.compare_at_price > variant.price
+      assign on_sale = true
+    endif
+  elsif product != blank
+    assign target_price = product.price
+    assign target_compare = product.compare_at_price
+    assign available = product.available
+    assign on_sale = false
+    if product.compare_at_price > product.price
+      assign on_sale = true
+    endif
+    assign price_varies = false
+    if product.price_min != product.price_max
+      assign price_varies = true
+    endif
+  endif
+-%}
+
+<div class="mg-price {% if on_sale %}mg-price--on-sale{% endif %} {% unless available %}mg-price--sold-out{% endunless %} {{ class }}">
+  {%- if product != blank and price_varies and variant == blank -%}
+    <span class="mg-price__from">{{ 'products.price.from' | t | default: 'From' }}</span>
+    <span class="mg-price__amount">{{ product.price_min | money }}</span>
+  {%- else -%}
+    {%- if on_sale and show_compare -%}
+      <span class="mg-price__compare"><s>{{ target_compare | money }}</s></span>
+    {%- endif -%}
+    <span class="mg-price__amount {% if on_sale %}mg-price__amount--sale{% endif %}">{{ target_price | money }}</span>
+  {%- endif -%}
+
+  {%- if show_unit and variant != blank and variant.unit_price_measurement -%}
+    <span class="mg-price__unit">
+      {{ variant.unit_price | money }}/{% if variant.unit_price_measurement.reference_value != 1 %}{{ variant.unit_price_measurement.reference_value }}{% endif %}{{ variant.unit_price_measurement.reference_unit }}
+    </span>
+  {%- endif -%}
+</div>
