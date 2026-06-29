@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "main-product": {
+      "type": "main-product",
+      "blocks": {
+        "details": { "type": "accordion", "settings": { "heading": "Details" } },
+        "shipping": { "type": "accordion", "settings": { "heading": "Shipping & Returns" } },
+        "share": { "type": "share" }
+      },
+      "block_order": ["details", "shipping", "share"],
+      "settings": {
+        "image_ratio": "4/5",
+        "show_breadcrumb": true,
+        "show_vendor": true,
+        "show_quantity": true,
+        "show_wishlist": true
+      }
+    },
+    "recently-viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "eyebrow": "Continue browsing",
+        "heading": "Recently viewed",
+        "product_limit": 8
+      }
+    }
+  },
+  "order": ["main-product", "recently-viewed"]
+}

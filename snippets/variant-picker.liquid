@@ -1,0 +1,56 @@
+{%- comment -%}
+  variant-picker.liquid — accessible variant selector (pills + color
+  swatches). Driven by <mg-product-form> in product.js. Param: product.
+{%- endcomment -%}
+{%- unless product.has_only_default_variant -%}
+  <div class="mg-variants" data-mg-variant-picker>
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign dn = option.name | downcase
+        assign is_color = false
+        if dn contains 'color' or dn contains 'colour'
+          assign is_color = true
+        endif
+      -%}
+      <fieldset class="mg-variants__group">
+        <legend class="mg-variants__legend">
+          {{ option.name }}<span class="mg-variants__selected" data-mg-option-label="{{ option.position }}">{{ option.selected_value }}</span>
+        </legend>
+        <div class="mg-variants__options {% if is_color %}mg-variants__options--swatch{% endif %}">
+          {%- for value in option.values -%}
+            {%- liquid
+              assign input_id = 'opt-' | append: section.id | append: '-' | append: option.position | append: '-' | append: forloop.index
+              assign checked = false
+              if value.selected or option.selected_value == value
+                assign checked = true
+              endif
+              assign swatch_style = ''
+              if is_color and value.swatch.color
+                assign swatch_style = 'background-color:' | append: value.swatch.color | append: ';'
+              elsif is_color and value.swatch.image
+                assign swatch_style = 'background-image:url(' | append: value.swatch.image | image_url: width: 60 | append: ');'
+              endif
+            -%}
+            <label class="mg-variants__option {% if is_color %}mg-variants__option--swatch{% endif %}" for="{{ input_id }}" {% if is_color %}title="{{ value | escape }}"{% endif %}>
+              <input
+                type="radio"
+                id="{{ input_id }}"
+                name="option{{ option.position }}"
+                value="{{ value | escape }}"
+                {% if checked %}checked{% endif %}
+                data-mg-option
+                data-option-position="{{ option.position }}"
+              >
+              {%- if is_color -%}
+                <span class="mg-variants__swatch" style="{{ swatch_style }}" aria-hidden="true"></span>
+                <span class="visually-hidden">{{ value | escape }}</span>
+              {%- else -%}
+                <span class="mg-variants__pill">{{ value | escape }}</span>
+              {%- endif -%}
+            </label>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+    {%- endfor -%}
+  </div>
+{%- endunless -%}

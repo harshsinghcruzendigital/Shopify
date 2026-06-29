@@ -22,6 +22,10 @@
       <meta name="description" content="{{ page_description | escape }}">
     {%- endif -%}
 
+    {%- if request.page_type == 'product' -%}
+      <meta name="mg:product-handle" content="{{ product.handle }}">
+    {%- endif -%}
+
     {% comment %} --- Fonts (CDN for dev; self-host woff2 before commercial release) --- {% endcomment %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

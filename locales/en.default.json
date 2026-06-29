@@ -106,6 +106,12 @@
     "no_results": "No results found for"
   },
   "products": {
+    "add_to_cart": "Add to cart",
+    "sold_out": "Sold out",
+    "unavailable": "Unavailable",
+    "media": {
+      "view": "View media"
+    },
     "price": {
       "from": "From"
     },
